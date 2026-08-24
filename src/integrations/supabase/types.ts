@@ -14,16 +14,358 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      answers: {
+        Row: {
+          answer_text: string
+          id: string
+          lesson_id: string
+          question_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer_text?: string
+          id?: string
+          lesson_id: string
+          question_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer_text?: string
+          id?: string
+          lesson_id?: string
+          question_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "lesson_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baptism_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reflection: string
+          seeker_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reflection?: string
+          seeker_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reflection?: string
+          seeker_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      lesson_messages: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          lesson_id: string | null
+          seeker_id: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          seeker_id: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          lesson_id?: string | null
+          seeker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_messages_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_questions: {
+        Row: {
+          id: string
+          lesson_id: string
+          position: number
+          prompt_en: string
+          prompt_fr: string
+          verse_ref: string
+        }
+        Insert: {
+          id?: string
+          lesson_id: string
+          position: number
+          prompt_en?: string
+          prompt_fr: string
+          verse_ref?: string
+        }
+        Update: {
+          id?: string
+          lesson_id?: string
+          position?: number
+          prompt_en?: string
+          prompt_fr?: string
+          verse_ref?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_questions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          id: string
+          intro_en: string
+          intro_fr: string
+          position: number
+          takeaway_en: string
+          takeaway_fr: string
+          title_en: string
+          title_fr: string
+        }
+        Insert: {
+          id?: string
+          intro_en?: string
+          intro_fr?: string
+          position: number
+          takeaway_en?: string
+          takeaway_fr?: string
+          title_en: string
+          title_fr: string
+        }
+        Update: {
+          id?: string
+          intro_en?: string
+          intro_fr?: string
+          position?: number
+          takeaway_en?: string
+          takeaway_fr?: string
+          title_en?: string
+          title_fr?: string
+        }
+        Relationships: []
+      }
+      mentor_links: {
+        Row: {
+          created_at: string
+          id: string
+          mentor_id: string
+          seeker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mentor_id: string
+          seeker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mentor_id?: string
+          seeker_id?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          lesson_id: string | null
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          kind?: string
+          lesson_id?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          lesson_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          invite_code: string
+          preferred_lang: string
+          reminders_enabled: boolean
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string
+          id: string
+          invite_code?: string
+          preferred_lang?: string
+          reminders_enabled?: boolean
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          invite_code?: string
+          preferred_lang?: string
+          reminders_enabled?: boolean
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          lesson_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          lesson_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          lesson_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          mentor_id: string
+          notes: string
+          scheduled_at: string
+          seeker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mentor_id: string
+          notes?: string
+          scheduled_at: string
+          seeker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mentor_id?: string
+          notes?: string
+          scheduled_at?: string
+          seeker_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_mentor_of: {
+        Args: { _mentor: string; _seeker: string }
+        Returns: boolean
+      }
+      link_seeker_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "seeker" | "mentor" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +492,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["seeker", "mentor", "admin"],
+    },
   },
 } as const
