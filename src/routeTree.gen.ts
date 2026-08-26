@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedParcoursRouteImport } from './routes/_authenticated/parcours'
 import { Route as AuthenticatedLeconsIndexRouteImport } from './routes/_authenticated/lecons.index'
+import { Route as AuthenticatedLeconsPositionRouteImport } from './routes/_authenticated/lecons.$position'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,17 +41,25 @@ const AuthenticatedLeconsIndexRoute =
     path: '/lecons/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLeconsPositionRoute =
+  AuthenticatedLeconsPositionRouteImport.update({
+    id: '/lecons/$position',
+    path: '/lecons/$position',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/parcours': typeof AuthenticatedParcoursRoute
+  '/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/lecons/': typeof AuthenticatedLeconsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/parcours': typeof AuthenticatedParcoursRoute
+  '/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/lecons': typeof AuthenticatedLeconsIndexRoute
 }
 export interface FileRoutesById {
@@ -59,19 +68,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/parcours': typeof AuthenticatedParcoursRoute
+  '/_authenticated/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/_authenticated/lecons/': typeof AuthenticatedLeconsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/parcours' | '/lecons/'
+  fullPaths: '/' | '/auth' | '/parcours' | '/lecons/$position' | '/lecons/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/parcours' | '/lecons'
+  to: '/' | '/auth' | '/parcours' | '/lecons/$position' | '/lecons'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/parcours'
+    | '/_authenticated/lecons/$position'
     | '/_authenticated/lecons/'
   fileRoutesById: FileRoutesById
 }
@@ -118,16 +129,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeconsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/lecons/$position': {
+      id: '/_authenticated/lecons/$position'
+      path: '/lecons/$position'
+      fullPath: '/lecons/$position'
+      preLoaderRoute: typeof AuthenticatedLeconsPositionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedParcoursRoute: typeof AuthenticatedParcoursRoute
+  AuthenticatedLeconsPositionRoute: typeof AuthenticatedLeconsPositionRoute
   AuthenticatedLeconsIndexRoute: typeof AuthenticatedLeconsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedParcoursRoute: AuthenticatedParcoursRoute,
+  AuthenticatedLeconsPositionRoute: AuthenticatedLeconsPositionRoute,
   AuthenticatedLeconsIndexRoute: AuthenticatedLeconsIndexRoute,
 }
 
