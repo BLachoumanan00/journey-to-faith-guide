@@ -16,11 +16,13 @@ import {
   lessonIntro,
   lessonTakeaway,
   lessonTitle,
+  questionOptions,
   questionPrompt,
   saveAnswer,
   setProgress,
   statusOf,
 } from "@/lib/study";
+
 
 export const Route = createFileRoute("/_authenticated/lecons/$position")({
   component: LessonPage,
