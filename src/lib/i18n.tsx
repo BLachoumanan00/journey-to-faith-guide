@@ -18,6 +18,15 @@ const dict = {
   lesson: { fr: "Leçon", en: "Lesson" },
   readVerse: { fr: "Lire le verset", en: "Read the verse" },
   yourAnswer: { fr: "Votre réponse basée sur le texte…", en: "Your answer based on the text…" },
+  chooseAnswer: { fr: "Choisissez la réponse du texte", en: "Choose the answer from the text" },
+  goodAnswer: {
+    fr: "C'est bien cela — le texte le dit ainsi.",
+    en: "That's it — this is what the text says.",
+  },
+  tryAgain: {
+    fr: "Relisez le verset et essayez encore, tranquillement.",
+    en: "Read the verse again and try once more, gently.",
+  },
   takeaway: { fr: "À retenir", en: "Takeaway" },
   saved: { fr: "Réponse enregistrée", en: "Answer saved" },
   markComplete: { fr: "Marquer cette leçon comme terminée", en: "Mark this lesson complete" },
@@ -25,6 +34,7 @@ const dict = {
     fr: "Répondez à toutes les questions pour marquer la leçon terminée — prenez votre temps.",
     en: "Answer every question to mark the lesson complete — take your time.",
   },
+
   lessonDone: { fr: "Leçon terminée. Merci pour ce temps passé.", en: "Lesson complete. Thank you for this time." },
   askMentor: { fr: "Une question pour votre mentor ?", en: "A question for your mentor?" },
   send: { fr: "Envoyer", en: "Send" },
