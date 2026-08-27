@@ -42,7 +42,11 @@ export const lessonTakeaway = (l: Lesson, lang: "fr" | "en") =>
 export const questionPrompt = (q: Question, lang: "fr" | "en") =>
   lang === "en" && q.prompt_en ? q.prompt_en : q.prompt_fr;
 
+export const questionOptions = (q: Question, lang: "fr" | "en") =>
+  lang === "en" && q.options_en?.length ? q.options_en : (q.options_fr ?? []);
+
 export async function fetchLessons() {
+
   const { data, error } = await supabase
     .from("lessons")
     .select("id, position, title_fr, title_en, intro_fr, intro_en, takeaway_fr, takeaway_en")
