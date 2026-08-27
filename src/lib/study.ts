@@ -18,7 +18,11 @@ export type Question = {
   verse_ref: string;
   prompt_fr: string;
   prompt_en: string;
+  options_fr: string[];
+  options_en: string[];
+  correct_index: number | null;
 };
+
 
 export type ProgressRow = {
   id: string;
