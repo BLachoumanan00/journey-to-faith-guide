@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedBaptemeRouteImport } from './routes/_authenticated/bapteme'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMentorRouteImport } from './routes/_authenticated/mentor'
 import { Route as AuthenticatedParcoursRouteImport } from './routes/_authenticated/parcours'
@@ -31,6 +32,11 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedBaptemeRoute = AuthenticatedBaptemeRouteImport.update({
+  id: '/bapteme',
+  path: '/bapteme',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedJournalRoute = AuthenticatedJournalRouteImport.update({
   id: '/journal',
@@ -63,6 +69,7 @@ const AuthenticatedLeconsPositionRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bapteme': typeof AuthenticatedBaptemeRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
   '/parcours': typeof AuthenticatedParcoursRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/bapteme': typeof AuthenticatedBaptemeRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
   '/parcours': typeof AuthenticatedParcoursRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/bapteme': typeof AuthenticatedBaptemeRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/mentor': typeof AuthenticatedMentorRoute
   '/_authenticated/parcours': typeof AuthenticatedParcoursRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/bapteme'
     | '/journal'
     | '/mentor'
     | '/parcours'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/bapteme'
     | '/journal'
     | '/mentor'
     | '/parcours'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/bapteme'
     | '/_authenticated/journal'
     | '/_authenticated/mentor'
     | '/_authenticated/parcours'
@@ -148,6 +160,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/bapteme': {
+      id: '/_authenticated/bapteme'
+      path: '/bapteme'
+      fullPath: '/bapteme'
+      preLoaderRoute: typeof AuthenticatedBaptemeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/journal': {
       id: '/_authenticated/journal'
@@ -188,6 +207,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBaptemeRoute: typeof AuthenticatedBaptemeRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMentorRoute: typeof AuthenticatedMentorRoute
   AuthenticatedParcoursRoute: typeof AuthenticatedParcoursRoute
@@ -196,6 +216,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBaptemeRoute: AuthenticatedBaptemeRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMentorRoute: AuthenticatedMentorRoute,
   AuthenticatedParcoursRoute: AuthenticatedParcoursRoute,
