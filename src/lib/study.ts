@@ -58,7 +58,7 @@ export async function fetchLessons() {
 export async function fetchQuestions(lessonId: string) {
   const { data, error } = await supabase
     .from("lesson_questions")
-    .select("id, lesson_id, position, verse_ref, prompt_fr, prompt_en")
+    .select("id, lesson_id, position, verse_ref, prompt_fr, prompt_en, options_fr, options_en, correct_index")
     .eq("lesson_id", lessonId)
     .order("position");
   if (error) throw error;
@@ -77,7 +77,7 @@ export async function fetchProgress(userId: string) {
 export async function fetchAnswers(userId: string, lessonId: string) {
   const { data, error } = await supabase
     .from("answers")
-    .select("id, question_id, answer_text")
+    .select("id, question_id, answer_text, choice_index")
     .eq("user_id", userId)
     .eq("lesson_id", lessonId);
   if (error) throw error;
@@ -89,6 +89,7 @@ export async function saveAnswer(input: {
   lessonId: string;
   questionId: string;
   text: string;
+  choiceIndex: number;
 }) {
   const { error } = await supabase.from("answers").upsert(
     {
@@ -96,10 +97,12 @@ export async function saveAnswer(input: {
       lesson_id: input.lessonId,
       question_id: input.questionId,
       answer_text: input.text,
+      choice_index: input.choiceIndex,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id,question_id" },
   );
+
   if (error) throw error;
 }
 
