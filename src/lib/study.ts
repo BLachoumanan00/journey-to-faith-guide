@@ -18,7 +18,11 @@ export type Question = {
   verse_ref: string;
   prompt_fr: string;
   prompt_en: string;
+  options_fr: string[];
+  options_en: string[];
+  correct_index: number | null;
 };
+
 
 export type ProgressRow = {
   id: string;
@@ -38,7 +42,11 @@ export const lessonTakeaway = (l: Lesson, lang: "fr" | "en") =>
 export const questionPrompt = (q: Question, lang: "fr" | "en") =>
   lang === "en" && q.prompt_en ? q.prompt_en : q.prompt_fr;
 
+export const questionOptions = (q: Question, lang: "fr" | "en") =>
+  lang === "en" && q.options_en?.length ? q.options_en : (q.options_fr ?? []);
+
 export async function fetchLessons() {
+
   const { data, error } = await supabase
     .from("lessons")
     .select("id, position, title_fr, title_en, intro_fr, intro_en, takeaway_fr, takeaway_en")
@@ -50,7 +58,7 @@ export async function fetchLessons() {
 export async function fetchQuestions(lessonId: string) {
   const { data, error } = await supabase
     .from("lesson_questions")
-    .select("id, lesson_id, position, verse_ref, prompt_fr, prompt_en")
+    .select("id, lesson_id, position, verse_ref, prompt_fr, prompt_en, options_fr, options_en, correct_index")
     .eq("lesson_id", lessonId)
     .order("position");
   if (error) throw error;
@@ -69,7 +77,7 @@ export async function fetchProgress(userId: string) {
 export async function fetchAnswers(userId: string, lessonId: string) {
   const { data, error } = await supabase
     .from("answers")
-    .select("id, question_id, answer_text")
+    .select("id, question_id, answer_text, choice_index")
     .eq("user_id", userId)
     .eq("lesson_id", lessonId);
   if (error) throw error;
@@ -81,6 +89,7 @@ export async function saveAnswer(input: {
   lessonId: string;
   questionId: string;
   text: string;
+  choiceIndex: number;
 }) {
   const { error } = await supabase.from("answers").upsert(
     {
@@ -88,10 +97,12 @@ export async function saveAnswer(input: {
       lesson_id: input.lessonId,
       question_id: input.questionId,
       answer_text: input.text,
+      choice_index: input.choiceIndex,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "user_id,question_id" },
   );
+
   if (error) throw error;
 }
 

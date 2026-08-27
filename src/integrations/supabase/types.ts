@@ -17,6 +17,7 @@ export type Database = {
       answers: {
         Row: {
           answer_text: string
+          choice_index: number | null
           id: string
           lesson_id: string
           question_id: string
@@ -25,6 +26,7 @@ export type Database = {
         }
         Insert: {
           answer_text?: string
+          choice_index?: number | null
           id?: string
           lesson_id: string
           question_id: string
@@ -33,6 +35,7 @@ export type Database = {
         }
         Update: {
           answer_text?: string
+          choice_index?: number | null
           id?: string
           lesson_id?: string
           question_id?: string
@@ -117,24 +120,33 @@ export type Database = {
       }
       lesson_questions: {
         Row: {
+          correct_index: number | null
           id: string
           lesson_id: string
+          options_en: string[]
+          options_fr: string[]
           position: number
           prompt_en: string
           prompt_fr: string
           verse_ref: string
         }
         Insert: {
+          correct_index?: number | null
           id?: string
           lesson_id: string
+          options_en?: string[]
+          options_fr?: string[]
           position: number
           prompt_en?: string
           prompt_fr: string
           verse_ref?: string
         }
         Update: {
+          correct_index?: number | null
           id?: string
           lesson_id?: string
+          options_en?: string[]
+          options_fr?: string[]
           position?: number
           prompt_en?: string
           prompt_fr?: string
