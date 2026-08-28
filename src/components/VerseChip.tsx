@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { fetchVerse, TRANSLATIONS } from "@/lib/bible";
+import { defaultTranslation, fetchVerse, translationsFor } from "@/lib/bible";
 import { useLang } from "@/lib/i18n";
 
 export function VerseChip({ reference, showHint = true }: { reference: string; showHint?: boolean }) {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [open, setOpen] = useState(false);
-  const [translation, setTranslation] = useState<string>("kjv");
+  const [translation, setTranslation] = useState<string>(() => defaultTranslation(lang));
+
+  // Following the language toggle keeps French readers in Louis Segond.
+  useEffect(() => {
+    setTranslation(defaultTranslation(lang));
+  }, [lang]);
 
   const verse = useQuery({
     queryKey: ["verse", reference, translation],
@@ -16,6 +21,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
     enabled: open,
     staleTime: Infinity,
   });
+
 
   return (
     <>
@@ -40,7 +46,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
           </DialogHeader>
 
           <div className="flex flex-wrap gap-2">
-            {TRANSLATIONS.map((tr) => (
+            {translationsFor(lang).map((tr) => (
               <button
                 key={tr.id}
                 type="button"
@@ -51,10 +57,11 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
                     : "rounded-full border border-border px-3 py-1 text-[10px] uppercase tracking-widest text-clay"
                 }
               >
-                {tr.id}
+                {tr.label}
               </button>
             ))}
           </div>
+
 
           <div className="min-h-24 text-base leading-relaxed">
             {verse.isPending ? (

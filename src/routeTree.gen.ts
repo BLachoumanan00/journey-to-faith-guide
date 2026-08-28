@@ -16,6 +16,7 @@ import { Route as AuthenticatedBaptemeRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMentorRouteImport } from './routes/_authenticated/mentor'
 import { Route as AuthenticatedParcoursRouteImport } from './routes/_authenticated/parcours'
+import { Route as AuthenticatedProfilRouteImport } from './routes/_authenticated/profil'
 import { Route as AuthenticatedLeconsIndexRouteImport } from './routes/_authenticated/lecons.index'
 import { Route as AuthenticatedLeconsPositionRouteImport } from './routes/_authenticated/lecons.$position'
 
@@ -53,6 +54,11 @@ const AuthenticatedParcoursRoute = AuthenticatedParcoursRouteImport.update({
   path: '/parcours',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfilRoute = AuthenticatedProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLeconsIndexRoute =
   AuthenticatedLeconsIndexRouteImport.update({
     id: '/lecons/',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
   '/parcours': typeof AuthenticatedParcoursRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/lecons/': typeof AuthenticatedLeconsIndexRoute
 }
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
   '/parcours': typeof AuthenticatedParcoursRoute
+  '/profil': typeof AuthenticatedProfilRoute
   '/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/lecons': typeof AuthenticatedLeconsIndexRoute
 }
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/mentor': typeof AuthenticatedMentorRoute
   '/_authenticated/parcours': typeof AuthenticatedParcoursRoute
+  '/_authenticated/profil': typeof AuthenticatedProfilRoute
   '/_authenticated/lecons/$position': typeof AuthenticatedLeconsPositionRoute
   '/_authenticated/lecons/': typeof AuthenticatedLeconsIndexRoute
 }
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/mentor'
     | '/parcours'
+    | '/profil'
     | '/lecons/$position'
     | '/lecons/'
   fileRoutesByTo: FileRoutesByTo
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/mentor'
     | '/parcours'
+    | '/profil'
     | '/lecons/$position'
     | '/lecons'
   id:
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/_authenticated/journal'
     | '/_authenticated/mentor'
     | '/_authenticated/parcours'
+    | '/_authenticated/profil'
     | '/_authenticated/lecons/$position'
     | '/_authenticated/lecons/'
   fileRoutesById: FileRoutesById
@@ -189,6 +201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParcoursRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profil': {
+      id: '/_authenticated/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof AuthenticatedProfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lecons/': {
       id: '/_authenticated/lecons/'
       path: '/lecons'
@@ -211,6 +230,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMentorRoute: typeof AuthenticatedMentorRoute
   AuthenticatedParcoursRoute: typeof AuthenticatedParcoursRoute
+  AuthenticatedProfilRoute: typeof AuthenticatedProfilRoute
   AuthenticatedLeconsPositionRoute: typeof AuthenticatedLeconsPositionRoute
   AuthenticatedLeconsIndexRoute: typeof AuthenticatedLeconsIndexRoute
 }
@@ -220,6 +240,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMentorRoute: AuthenticatedMentorRoute,
   AuthenticatedParcoursRoute: AuthenticatedParcoursRoute,
+  AuthenticatedProfilRoute: AuthenticatedProfilRoute,
   AuthenticatedLeconsPositionRoute: AuthenticatedLeconsPositionRoute,
   AuthenticatedLeconsIndexRoute: AuthenticatedLeconsIndexRoute,
 }

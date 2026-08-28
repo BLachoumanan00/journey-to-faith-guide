@@ -55,14 +55,16 @@ function LessonPage() {
     enabled: Boolean(user?.id),
   });
 
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [picked, setPicked] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!answers.data) return;
-    const next: Record<string, string> = {};
-    for (const a of answers.data) next[a.question_id] = a.answer_text;
-    setDrafts((prev) => ({ ...next, ...prev }));
+    const next: Record<string, number> = {};
+    for (const a of answers.data) {
+      if (typeof a.choice_index === "number") next[a.question_id] = a.choice_index;
+    }
+    setPicked((prev) => ({ ...next, ...prev }));
   }, [answers.data]);
 
   // Opening a lesson marks it as started so the journey reflects where you are.
@@ -76,14 +78,14 @@ function LessonPage() {
   }, [user?.id, lesson?.id, progress.data, qc]);
 
   const save = useMutation({
-    mutationFn: (input: { questionId: string; text: string }) =>
+    mutationFn: (input: { questionId: string; text: string; choiceIndex: number }) =>
       saveAnswer({ userId: user!.id, lessonId: lesson!.id, ...input }),
     onSuccess: () => {
-      toast.success(t("saved"));
       qc.invalidateQueries({ queryKey: ["answers", user?.id, lesson?.id] });
     },
     onError: () => toast.error("Impossible d'enregistrer pour l'instant."),
   });
+
 
   const complete = useMutation({
     mutationFn: () => setProgress({ userId: user!.id, lessonId: lesson!.id, status: "completed" }),
@@ -119,7 +121,10 @@ function LessonPage() {
   }
 
   const qs = questions.data ?? [];
-  const allAnswered = qs.length > 0 && qs.every((q) => (drafts[q.id] ?? "").trim().length > 0);
+  const isCorrect = (q: (typeof qs)[number]) =>
+    typeof picked[q.id] === "number" &&
+    (q.correct_index === null || picked[q.id] === q.correct_index);
+  const allAnswered = qs.length > 0 && qs.every(isCorrect);
   const isDone = statusOf(progress.data ?? [], lesson.id) === "completed";
 
   return (
@@ -131,34 +136,78 @@ function LessonPage() {
       <p className="mt-4 text-base leading-relaxed text-clay">{lessonIntro(lesson, lang)}</p>
 
       <div className="mt-10 space-y-10">
-        {qs.map((q, i) => (
-          <div key={q.id} className="border-t border-border pt-6">
-            <div className="flex items-baseline gap-3">
-              <span className="font-serif text-lg text-clay">{i + 1}</span>
-              <p className="flex-1 font-serif text-xl leading-snug">{questionPrompt(q, lang)}</p>
-            </div>
-            {q.verse_ref ? (
-              <div className="mt-3 pl-8">
-                <VerseChip reference={q.verse_ref} />
+        {qs.map((q, i) => {
+          const options = questionOptions(q, lang);
+          const choice = picked[q.id];
+          const answered = typeof choice === "number";
+          const correct = answered && (q.correct_index === null || choice === q.correct_index);
+
+          return (
+            <div key={q.id} className="border-t border-border pt-6">
+              <div className="flex items-baseline gap-3">
+                <span className="font-serif text-lg text-clay">{i + 1}</span>
+                <p className="flex-1 font-serif text-xl leading-snug">{questionPrompt(q, lang)}</p>
               </div>
-            ) : null}
-            <div className="mt-4 pl-8">
-              <textarea
-                value={drafts[q.id] ?? ""}
-                onChange={(e) => setDrafts((d) => ({ ...d, [q.id]: e.target.value }))}
-                onBlur={() => {
-                  const text = (drafts[q.id] ?? "").trim();
-                  const existing = answers.data?.find((a) => a.question_id === q.id)?.answer_text ?? "";
-                  if (text && text !== existing) save.mutate({ questionId: q.id, text });
-                }}
-                rows={4}
-                placeholder={t("yourAnswer")}
-                className="w-full resize-none rounded-lg border border-border bg-card px-3 py-3 text-base leading-relaxed outline-none focus:ring-2 focus:ring-ring/30"
-              />
+              {q.verse_ref ? (
+                <div className="mt-3 pl-8">
+                  <VerseChip reference={q.verse_ref} />
+                </div>
+              ) : null}
+
+              <div className="mt-4 space-y-2 pl-8" role="radiogroup" aria-label={questionPrompt(q, lang)}>
+                {options.length === 0 ? (
+                  <p className="text-sm italic text-clay">{t("loading")}</p>
+                ) : (
+                  options.map((option, index) => {
+                    const selected = choice === index;
+                    const showRight = selected && correct;
+                    const showWrong = selected && !correct;
+                    return (
+                      <button
+                        key={index}
+                        type="button"
+                        role="radio"
+                        aria-checked={selected}
+                        onClick={() => {
+                          setPicked((p) => ({ ...p, [q.id]: index }));
+                          save.mutate({ questionId: q.id, text: option, choiceIndex: index });
+                        }}
+                        className={[
+                          "flex w-full items-start gap-3 rounded-lg border px-3 py-3 text-left text-base leading-relaxed transition-colors",
+                          showRight
+                            ? "border-ribbon bg-ribbon/10"
+                            : showWrong
+                              ? "border-clay/50 bg-sand/60"
+                              : "border-border bg-card hover:bg-sand/40",
+                        ].join(" ")}
+                      >
+                        <span
+                          className={[
+                            "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border text-[10px]",
+                            selected ? "border-ink bg-ink text-paper" : "border-border text-clay",
+                          ].join(" ")}
+                        >
+                          {String.fromCharCode(65 + index)}
+                        </span>
+                        <span className="flex-1">{option}</span>
+                      </button>
+                    );
+                  })
+                )}
+
+                {answered ? (
+                  <p className={correct ? "pt-1 text-sm text-ribbon" : "pt-1 text-sm text-clay"}>
+                    {correct ? t("goodAnswer") : t("tryAgain")}
+                  </p>
+                ) : (
+                  <p className="pt-1 text-xs uppercase tracking-wider text-clay">{t("chooseAnswer")}</p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
 
       {lessonTakeaway(lesson, lang) ? (
         <div className="mt-10 rounded-xl bg-sand/60 p-5">
