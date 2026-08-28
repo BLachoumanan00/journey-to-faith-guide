@@ -83,7 +83,7 @@ function Landing() {
 
         <div className="mt-auto pt-12">
           <Link
-            to="/auth"
+            to="/parcours"
             className="block w-full rounded-lg bg-ink px-4 py-3.5 text-center text-sm font-medium text-paper"
           >
             {fr ? "Commencer la première leçon" : "Start the first lesson"}

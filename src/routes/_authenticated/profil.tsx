@@ -136,19 +136,6 @@ function ProfilePage() {
           </p>
         </div>
 
-        <div className="border-t border-border pt-6">
-          <button
-            type="button"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              qc.clear();
-              navigate({ to: "/auth" });
-            }}
-            className="text-sm font-medium text-clay"
-          >
-            {t("signOut")}
-          </button>
-        </div>
       </div>
     </AppShell>
   );
