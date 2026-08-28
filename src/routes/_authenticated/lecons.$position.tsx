@@ -55,14 +55,16 @@ function LessonPage() {
     enabled: Boolean(user?.id),
   });
 
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [picked, setPicked] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!answers.data) return;
-    const next: Record<string, string> = {};
-    for (const a of answers.data) next[a.question_id] = a.answer_text;
-    setDrafts((prev) => ({ ...next, ...prev }));
+    const next: Record<string, number> = {};
+    for (const a of answers.data) {
+      if (typeof a.choice_index === "number") next[a.question_id] = a.choice_index;
+    }
+    setPicked((prev) => ({ ...next, ...prev }));
   }, [answers.data]);
 
   // Opening a lesson marks it as started so the journey reflects where you are.
@@ -76,14 +78,14 @@ function LessonPage() {
   }, [user?.id, lesson?.id, progress.data, qc]);
 
   const save = useMutation({
-    mutationFn: (input: { questionId: string; text: string }) =>
+    mutationFn: (input: { questionId: string; text: string; choiceIndex: number }) =>
       saveAnswer({ userId: user!.id, lessonId: lesson!.id, ...input }),
     onSuccess: () => {
-      toast.success(t("saved"));
       qc.invalidateQueries({ queryKey: ["answers", user?.id, lesson?.id] });
     },
     onError: () => toast.error("Impossible d'enregistrer pour l'instant."),
   });
+
 
   const complete = useMutation({
     mutationFn: () => setProgress({ userId: user!.id, lessonId: lesson!.id, status: "completed" }),
