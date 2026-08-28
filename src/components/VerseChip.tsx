@@ -46,7 +46,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
           </DialogHeader>
 
           <div className="flex flex-wrap gap-2">
-            {TRANSLATIONS.map((tr) => (
+            {translationsFor(lang).map((tr) => (
               <button
                 key={tr.id}
                 type="button"
@@ -57,10 +57,11 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
                     : "rounded-full border border-border px-3 py-1 text-[10px] uppercase tracking-widest text-clay"
                 }
               >
-                {tr.id}
+                {tr.label}
               </button>
             ))}
           </div>
+
 
           <div className="min-h-24 text-base leading-relaxed">
             {verse.isPending ? (
