@@ -14,6 +14,7 @@ import {
   fetchProgress,
   fetchQuestions,
   lessonIntro,
+  lessonExplanation,
   lessonTakeaway,
   lessonTitle,
   questionOptions,
@@ -213,6 +214,19 @@ function LessonPage() {
         <div className="mt-10 rounded-xl bg-sand/60 p-5">
           <span className="eyebrow">{t("takeaway")}</span>
           <p className="mt-2 font-serif text-lg leading-relaxed">{lessonTakeaway(lesson, lang)}</p>
+        </div>
+      ) : null}
+
+      {lessonExplanation(lesson, lang) ? (
+        <div className="mt-6 rounded-xl border border-border bg-card p-5">
+          <span className="eyebrow">{t("explanation")}</span>
+          {lessonExplanation(lesson, lang)
+            .split(/\n+/)
+            .map((paragraph, i) => (
+              <p key={i} className="mt-3 text-base leading-relaxed text-ink/90">
+                {paragraph}
+              </p>
+            ))}
         </div>
       ) : null}
 

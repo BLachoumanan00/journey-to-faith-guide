@@ -28,6 +28,7 @@ const dict = {
     en: "Read the verse again and try once more, gently.",
   },
   takeaway: { fr: "À retenir", en: "Takeaway" },
+  explanation: { fr: "Explication complète", en: "Full explanation" },
   saved: { fr: "Réponse enregistrée", en: "Answer saved" },
   markComplete: { fr: "Marquer cette leçon comme terminée", en: "Mark this lesson complete" },
   answerAllFirst: {
