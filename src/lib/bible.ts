@@ -144,6 +144,13 @@ export function toApiReference(reference: string): string {
   return `${parsed.book} ${parsed.chapter}${verses}`;
 }
 
+/** Reference shown in the UI: French book names in FR, English book names in EN. */
+export function displayReference(reference: string, lang: "fr" | "en"): string {
+  if (lang !== "en") return reference;
+  return toApiReference(reference);
+}
+
+
 export type VerseResult = { reference: string; text: string; translation: string };
 
 async function fetchFrench(
