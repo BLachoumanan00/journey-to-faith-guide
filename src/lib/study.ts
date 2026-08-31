@@ -9,6 +9,8 @@ export type Lesson = {
   intro_en: string;
   takeaway_fr: string;
   takeaway_en: string;
+  explanation_fr: string;
+  explanation_en: string;
 };
 
 export type Question = {
