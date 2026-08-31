@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +33,6 @@ function ProfilePage() {
   const { lang, t, setLang } = useLang();
   const { user } = useSessionUser();
   const profile = useProfile(user?.id);
-  const navigate = useNavigate();
   const qc = useQueryClient();
 
   const [name, setName] = useState("");
