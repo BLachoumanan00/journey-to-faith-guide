@@ -164,6 +164,8 @@ export type Database = {
       }
       lessons: {
         Row: {
+          explanation_en: string
+          explanation_fr: string
           id: string
           intro_en: string
           intro_fr: string
@@ -174,6 +176,8 @@ export type Database = {
           title_fr: string
         }
         Insert: {
+          explanation_en?: string
+          explanation_fr?: string
           id?: string
           intro_en?: string
           intro_fr?: string
@@ -184,6 +188,8 @@ export type Database = {
           title_fr: string
         }
         Update: {
+          explanation_en?: string
+          explanation_fr?: string
           id?: string
           intro_en?: string
           intro_fr?: string
