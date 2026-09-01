@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTranslation, fetchVerse, translationsFor } from "@/lib/bible";
+import { defaultTranslation, displayReference, fetchVerse, translationsFor } from "@/lib/bible";
 import { useLang } from "@/lib/i18n";
 
 export function VerseChip({ reference, showHint = true }: { reference: string; showHint?: boolean }) {
@@ -10,10 +10,14 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
   const [open, setOpen] = useState(false);
   const [translation, setTranslation] = useState<string>(() => defaultTranslation(lang));
 
+  // Book names follow the language toggle (Jean 3:16 → John 3:16).
+  const label = displayReference(reference, lang);
+
   // Following the language toggle keeps French readers in Louis Segond.
   useEffect(() => {
     setTranslation(defaultTranslation(lang));
   }, [lang]);
+
 
   const verse = useQuery({
     queryKey: ["verse", reference, translation],
