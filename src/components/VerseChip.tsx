@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { defaultTranslation, fetchVerse, translationsFor } from "@/lib/bible";
+import { defaultTranslation, displayReference, fetchVerse, translationsFor } from "@/lib/bible";
 import { useLang } from "@/lib/i18n";
 
 export function VerseChip({ reference, showHint = true }: { reference: string; showHint?: boolean }) {
@@ -10,10 +10,14 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
   const [open, setOpen] = useState(false);
   const [translation, setTranslation] = useState<string>(() => defaultTranslation(lang));
 
+  // Book names follow the language toggle (Jean 3:16 → John 3:16).
+  const label = displayReference(reference, lang);
+
   // Following the language toggle keeps French readers in Louis Segond.
   useEffect(() => {
     setTranslation(defaultTranslation(lang));
   }, [lang]);
+
 
   const verse = useQuery({
     queryKey: ["verse", reference, translation],
@@ -30,7 +34,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-2 rounded-full border border-border bg-sand/50 px-3 py-1.5 transition-colors hover:bg-sand"
       >
-        <span className="text-xs font-medium tracking-tight">{reference}</span>
+        <span className="text-xs font-medium tracking-tight">{label}</span>
         {showHint ? (
           <>
             <span className="size-1 rounded-full bg-clay/40" />
@@ -42,7 +46,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md rounded-2xl border-sand bg-card">
           <DialogHeader>
-            <DialogTitle className="font-serif text-2xl font-medium">{reference}</DialogTitle>
+            <DialogTitle className="font-serif text-2xl font-medium">{label}</DialogTitle>
           </DialogHeader>
 
           <div className="flex flex-wrap gap-2">
@@ -68,7 +72,9 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
               <p className="italic text-clay">{t("loading")}</p>
             ) : verse.isError ? (
               <p className="text-sm italic text-clay">
-                Le texte n'a pas pu être chargé. Ouvrez votre Bible à {reference}.
+                {lang === "en"
+                  ? `The text could not be loaded. Open your Bible at ${label}.`
+                  : `Le texte n'a pas pu être chargé. Ouvrez votre Bible à ${label}.`}
               </p>
             ) : (
               <>
