@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useLang } from "@/lib/i18n";
+import appIcon from "@/assets/app-icon.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,7 +27,7 @@ function Landing() {
   const fr = lang === "fr";
 
   return (
-    <div className="min-h-screen bg-paper text-ink">
+    <div className="min-h-screen text-ink">
       <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 py-12">
         <div className="flex items-start justify-between">
           <span className="eyebrow">{t("eyebrow")}</span>
@@ -39,7 +40,8 @@ function Landing() {
           </button>
         </div>
 
-        <h1 className="mt-10 font-serif text-5xl font-medium leading-[1.05]">
+        <img src={appIcon.url} alt="Bible en Main" className="mt-10 size-24 rounded-3xl shadow-[0_0_40px_-6px_var(--ribbon)]" />
+        <h1 className="mt-8 font-serif text-5xl font-medium leading-[1.05]">
           {fr ? (
             <>
               La Bible,
