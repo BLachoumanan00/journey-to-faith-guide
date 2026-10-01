@@ -6,7 +6,7 @@
 
 /*
  * "Bible en Main" design system — Papier et encre.
- * Warm paper neutrals, ink text, a single ribbon accent.
+ * Night navy surfaces, cream text, a single gold light accent (from the app icon).
  * All colors are oklch tokens; never hardcode colors in components.
  */
 
@@ -60,30 +60,30 @@
 :root {
   --radius: 0.75rem;
 
-  --paper: oklch(0.976 0.007 85);
-  --ink: oklch(0.271 0.007 60);
-  --sand: oklch(0.902 0.018 85);
-  --clay: oklch(0.531 0.015 75);
-  --ribbon: oklch(0.532 0.104 33);
+  --paper: oklch(0.2 0.06 262);
+  --ink: oklch(0.95 0.025 85);
+  --sand: oklch(0.3 0.07 262);
+  --clay: oklch(0.74 0.035 250);
+  --ribbon: oklch(0.82 0.12 82);
 
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: oklch(0.99 0.005 85);
+  --card: oklch(0.25 0.065 262);
   --card-foreground: var(--ink);
-  --popover: oklch(0.99 0.005 85);
+  --popover: oklch(0.25 0.065 262);
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
+  --primary: var(--ribbon);
   --primary-foreground: var(--paper);
   --secondary: var(--sand);
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.941 0.012 85);
+  --muted: oklch(0.27 0.06 262);
   --muted-foreground: var(--clay);
   --accent: var(--ribbon);
   --accent-foreground: var(--paper);
-  --destructive: oklch(0.512 0.16 25);
-  --destructive-foreground: var(--paper);
-  --border: oklch(0.271 0.007 60 / 8%);
-  --input: oklch(0.271 0.007 60 / 12%);
+  --destructive: oklch(0.62 0.18 25);
+  --destructive-foreground: var(--ink);
+  --border: oklch(0.82 0.12 82 / 16%);
+  --input: oklch(0.82 0.12 82 / 22%);
   --ring: var(--ribbon);
   --sidebar: var(--paper);
   --sidebar-foreground: var(--ink);
@@ -91,7 +91,7 @@
   --sidebar-primary-foreground: var(--paper);
   --sidebar-accent: var(--sand);
   --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: oklch(0.271 0.007 60 / 8%);
+  --sidebar-border: oklch(0.82 0.12 82 / 16%);
   --sidebar-ring: var(--ribbon);
 }
 
@@ -101,6 +101,7 @@
   }
 
   body {
+    background: radial-gradient(ellipse at top, oklch(0.28 0.08 262), var(--color-background) 60%) fixed;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);

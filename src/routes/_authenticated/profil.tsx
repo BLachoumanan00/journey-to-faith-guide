@@ -89,7 +89,7 @@ function ProfilePage() {
                 }}
                 className={
                   lang === code
-                    ? "rounded-full bg-ink px-4 py-1.5 text-xs uppercase tracking-widest text-paper"
+                    ? "rounded-full bg-ribbon px-4 py-1.5 text-xs uppercase tracking-widest text-paper"
                     : "rounded-full border border-border px-4 py-1.5 text-xs uppercase tracking-widest text-clay"
                 }
               >
