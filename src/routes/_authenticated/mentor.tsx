@@ -126,7 +126,7 @@ function MentorPage() {
             type="button"
             disabled={code.trim().length < 4 || link.isPending}
             onClick={() => link.mutate()}
-            className="rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-40"
+            className="rounded-lg bg-ribbon px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-40"
           >
             {t("link")}
           </button>

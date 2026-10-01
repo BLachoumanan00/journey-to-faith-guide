@@ -84,7 +84,7 @@ function BaptismPage() {
                 type="button"
                 disabled={request.isPending}
                 onClick={() => request.mutate()}
-                className="w-full rounded-lg bg-ink px-4 py-3 text-sm font-medium text-paper disabled:opacity-40"
+                className="w-full rounded-lg bg-ribbon px-4 py-3 text-sm font-medium text-paper disabled:opacity-40"
               >
                 {t("baptismTalk")}
               </button>

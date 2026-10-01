@@ -185,7 +185,7 @@ function LessonPage() {
                         <span
                           className={[
                             "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border text-[10px]",
-                            selected ? "border-ink bg-ink text-paper" : "border-border text-clay",
+                            selected ? "border-ribbon bg-ribbon text-paper" : "border-border text-clay",
                           ].join(" ")}
                         >
                           {String.fromCharCode(65 + index)}
@@ -239,7 +239,7 @@ function LessonPage() {
               type="button"
               disabled={!allAnswered || complete.isPending}
               onClick={() => complete.mutate()}
-              className="w-full rounded-lg bg-ink px-4 py-3 text-sm font-medium text-paper disabled:opacity-40"
+              className="w-full rounded-lg bg-ribbon px-4 py-3 text-sm font-medium text-paper disabled:opacity-40"
             >
               {t("markComplete")}
             </button>

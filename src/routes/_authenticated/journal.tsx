@@ -90,7 +90,7 @@ function JournalPage() {
         type="button"
         disabled={!body.trim() || add.isPending}
         onClick={() => add.mutate()}
-        className="mt-3 rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-40"
+        className="mt-3 rounded-lg bg-ribbon px-4 py-2.5 text-sm font-medium text-paper disabled:opacity-40"
       >
         {t("addNote")}
       </button>

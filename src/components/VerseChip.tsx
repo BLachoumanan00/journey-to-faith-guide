@@ -57,7 +57,7 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
                 onClick={() => setTranslation(tr.id)}
                 className={
                   translation === tr.id
-                    ? "rounded-full bg-ink px-3 py-1 text-[10px] uppercase tracking-widest text-paper"
+                    ? "rounded-full bg-ribbon px-3 py-1 text-[10px] uppercase tracking-widest text-paper"
                     : "rounded-full border border-border px-3 py-1 text-[10px] uppercase tracking-widest text-clay"
                 }
               >
