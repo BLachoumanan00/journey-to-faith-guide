@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { VerseChip } from "@/components/VerseChip";
+import { LessonAsk } from "@/components/LessonAsk";
 import { useLang } from "@/lib/i18n";
 import { useSessionUser } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -229,6 +230,8 @@ function LessonPage() {
             ))}
         </div>
       ) : null}
+
+      <LessonAsk lesson={lesson} questions={qs} lang={lang} />
 
       <div className="mt-10 border-t border-border pt-6">
         {isDone ? (
