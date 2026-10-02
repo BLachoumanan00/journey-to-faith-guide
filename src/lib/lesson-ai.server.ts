@@ -13,7 +13,7 @@ export type LessonContext = {
 };
 
 export async function explainLesson(ctx: LessonContext, question: string, lang: "fr" | "en") {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env['LOVABLE_API_KEY'];
   if (!apiKey) throw new Error("config");
   const provider = createOpenAI({
     baseURL: GATEWAY,
