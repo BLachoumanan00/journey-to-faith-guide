@@ -1,0 +1,12 @@
+{
+  "name": "Bible en Main",
+  "short_name": "Bible en Main",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0F1A2E",
+  "theme_color": "#0F1A2E",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
