@@ -5,11 +5,73 @@
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+  },
+  vite: {
+    plugins: [
+      VitePWA({
+        registerType: "autoUpdate",
+        injectRegister: null,
+        devOptions: { enabled: false },
+        manifest: false,
+        filename: "sw.js",
+        outDir: "dist/client",
+        strategies: "generateSW",
+        workbox: {
+          globDirectory: "dist/client",
+          globPatterns: ["**/*.{js,css,png,svg,woff2}"],
+          navigateFallback: null,
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
+          runtimeCaching: [
+            {
+              // Pages: always try the network first, fall back to the last saved copy.
+              urlPattern: ({ request, url }) =>
+                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "pages",
+                networkTimeoutSeconds: 4,
+                expiration: { maxEntries: 60 },
+              },
+            },
+            {
+              // Hashed build assets (same origin only).
+              urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/assets/"),
+              handler: "CacheFirst",
+              options: { cacheName: "assets", expiration: { maxEntries: 300 } },
+            },
+            {
+              // Lessons, questions, progress reads from the backend.
+              urlPattern: ({ url, request }) =>
+                request.method === "GET" && url.pathname.startsWith("/rest/v1/"),
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "lesson-data",
+                networkTimeoutSeconds: 5,
+                expiration: { maxEntries: 400 },
+              },
+            },
+            {
+              // Bible verses already looked up.
+              urlPattern: ({ url }) => url.hostname === "bolls.life",
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "bible-verses",
+                networkTimeoutSeconds: 5,
+                expiration: { maxEntries: 500 },
+              },
+            },
+          ],
+        },
+      }),
+    ],
   },
 });
