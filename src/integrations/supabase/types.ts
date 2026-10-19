@@ -257,6 +257,69 @@ export type Database = {
           },
         ]
       }
+      phone_auth_challenges: {
+        Row: {
+          attempts: number
+          consumed_at: string | null
+          created_at: string
+          details_encrypted: string
+          expires_at: string
+          guest_id: string | null
+          id: string
+          otp_type: string
+          phone_encrypted: string
+          phone_hash: string
+          secret_hash: string
+        }
+        Insert: {
+          attempts?: number
+          consumed_at?: string | null
+          created_at?: string
+          details_encrypted: string
+          expires_at?: string
+          guest_id?: string | null
+          id?: string
+          otp_type?: string
+          phone_encrypted: string
+          phone_hash: string
+          secret_hash: string
+        }
+        Update: {
+          attempts?: number
+          consumed_at?: string | null
+          created_at?: string
+          details_encrypted?: string
+          expires_at?: string
+          guest_id?: string | null
+          id?: string
+          otp_type?: string
+          phone_encrypted?: string
+          phone_hash?: string
+          secret_hash?: string
+        }
+        Relationships: []
+      }
+      phone_auth_limits: {
+        Row: {
+          key_hash: string
+          last_request: string
+          requests: number
+          window_start: string
+        }
+        Insert: {
+          key_hash: string
+          last_request?: string
+          requests?: number
+          window_start?: string
+        }
+        Update: {
+          key_hash?: string
+          last_request?: string
+          requests?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -364,11 +427,80 @@ export type Database = {
         }
         Relationships: []
       }
+      users: {
+        Row: {
+          address_encrypted: string
+          consent_privacy_at: string
+          consent_sensitive_at: string | null
+          created_at: string
+          full_name: string
+          id: string
+          last_login: string
+          phone_encrypted: string
+          phone_hash: string
+          policy_version: string
+        }
+        Insert: {
+          address_encrypted: string
+          consent_privacy_at?: string
+          consent_sensitive_at?: string | null
+          created_at?: string
+          full_name: string
+          id: string
+          last_login?: string
+          phone_encrypted: string
+          phone_hash: string
+          policy_version?: string
+        }
+        Update: {
+          address_encrypted?: string
+          consent_privacy_at?: string
+          consent_sensitive_at?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          last_login?: string
+          phone_encrypted?: string
+          phone_hash?: string
+          policy_version?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      claim_phone_attempt: {
+        Args: { _id: string; _secret_hash: string }
+        Returns: {
+          attempts: number
+          consumed_at: string | null
+          created_at: string
+          details_encrypted: string
+          expires_at: string
+          guest_id: string | null
+          id: string
+          otp_type: string
+          phone_encrypted: string
+          phone_hash: string
+          secret_hash: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "phone_auth_challenges"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_phone_request: {
+        Args: { _ip_hash: string; _phone_hash: string }
+        Returns: boolean
+      }
+      finish_phone_challenge: {
+        Args: { _id: string; _secret_hash: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -376,11 +508,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_sensitive_consent: { Args: never; Returns: boolean }
       is_mentor_of: {
         Args: { _mentor: string; _seeker: string }
         Returns: boolean
       }
       link_seeker_by_code: { Args: { _code: string }; Returns: string }
+      transfer_guest_study: {
+        Args: { _guest: string; _user: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "seeker" | "mentor" | "admin"

@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792388991390,
+      "tag": "0000_phone_accounts_and_verification_limits",
+      "breakpoints": true
+    }
+  ]
+}
