@@ -5,6 +5,8 @@ export const POLICY_VERSION = "2026-10-19";
 export const OTP_SECONDS = 300;
 export const MAX_OTP_ATTEMPTS = 5;
 export const RESEND_SECONDS = 60;
+export const PHONE_REQUESTS_PER_HOUR = 5;
+export const IP_REQUESTS_PER_HOUR = 20;
 const safeText = (min: number, max: number) => z.string().trim().min(min).max(max).refine(v => !/[\u0000-\u001f<>]/.test(v), "Invalid characters");
 export const detailsSchema = z.object({
   full_name: safeText(2, 80),
@@ -21,7 +23,8 @@ export function csvCell(value: unknown) {
   return `"${safe.replaceAll('"', '""')}"`;
 }
 export function csvRows(rows: Record<string, unknown>[]) {
-  if (!rows.length) return "";
-  const fields = Object.keys(rows[0]);
+  const first = rows[0];
+  if (!first) return "";
+  const fields = Object.keys(first);
   return [fields.map(csvCell).join(","), ...rows.map(r => fields.map(k => csvCell(r[k])).join(","))].join("\r\n");
 }
