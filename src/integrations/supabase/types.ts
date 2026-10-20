@@ -497,6 +497,7 @@ export type Database = {
         Args: { _ip_hash: string; _phone_hash: string }
         Returns: boolean
       }
+      erase_account_data: { Args: { _user: string }; Returns: undefined }
       finish_phone_challenge: {
         Args: { _id: string; _secret_hash: string }
         Returns: boolean
@@ -518,6 +519,7 @@ export type Database = {
         Args: { _guest: string; _user: string }
         Returns: undefined
       }
+      withdraw_account_consent: { Args: { _user: string }; Returns: undefined }
     }
     Enums: {
       app_role: "seeker" | "mentor" | "admin"
