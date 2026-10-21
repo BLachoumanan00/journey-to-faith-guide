@@ -26,13 +26,13 @@ export function PhoneAccountForm({ value, onChange, errors = {}, countryCode, se
       <select id="account-country" value={value.country} onChange={e => onChange({ ...value, country: e.target.value })} required autoComplete="country-name" className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm">
         <option value="">{fr ? "Choisir un pays" : "Select country"}</option>
         {getCountries().map(c => <option key={c} value={names.of(c)}>{names.of(c)}</option>)}
-      </select>{errors.country && <p className="text-xs text-destructive">{errors.country}</p>}
+      </select>{errors['country'] && <p className="text-xs text-destructive">{errors['country']}</p>}
     </div>
     {phone && <div className="space-y-2"><label htmlFor="account-phone" className="text-sm font-medium">{fr ? "Numéro de téléphone" : "Phone number"} <span className="text-ribbon">*</span></label>
       <div className="flex min-w-0 gap-2"><select aria-label={fr ? "Indicatif du pays" : "Country calling code"} value={countryCode} onChange={e => setCountryCode(e.target.value as CountryCode)} className="h-11 w-28 shrink-0 rounded-md border border-input bg-card px-2 text-sm">
         {getCountries().map(c => <option key={c} value={c}>{c} +{getCountryCallingCode(c)}</option>)}
-      </select><Input id="account-phone" type="tel" autoComplete="tel-national" inputMode="tel" required maxLength={25} value={value.phone} onChange={e => onChange({ ...value, phone: e.target.value })} aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "error-phone" : undefined} className="h-11 min-w-0 bg-card" /></div>
-      {errors.phone && <p id="error-phone" className="text-xs text-destructive">{errors.phone}</p>}
+      </select><Input id="account-phone" type="tel" autoComplete="tel-national" inputMode="tel" required maxLength={25} value={value.phone} onChange={e => onChange({ ...value, phone: e.target.value })} aria-invalid={Boolean(errors['phone'])} aria-describedby={errors['phone'] ? "error-phone" : undefined} className="h-11 min-w-0 bg-card" /></div>
+      {errors['phone'] && <p id="error-phone" className="text-xs text-destructive">{errors['phone']}</p>}
     </div>}
   </div>;
 }

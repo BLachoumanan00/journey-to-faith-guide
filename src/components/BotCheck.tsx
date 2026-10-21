@@ -8,7 +8,7 @@ export function BotCheck({ siteKey, onToken }: { siteKey: string; onToken: (toke
     const get = () => (window as unknown as { turnstile?: Turnstile }).turnstile;
     const render = () => { const api = get(); if (!active || widget || !api || !element.current) return; widget = api.render(element.current, { sitekey: siteKey, theme: "dark", size: "flexible", callback: (token: string) => callback.current(token), "expired-callback": () => callback.current(""), "error-callback": () => callback.current("") }); };
     let script = document.querySelector<HTMLScriptElement>('script[data-bible-turnstile]');
-    if (!script) { script = document.createElement("script"); script.dataset.bibleTurnstile = "true"; script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; script.async = true; document.head.appendChild(script); }
+    if (!script) { script = document.createElement("script"); script.dataset['bibleTurnstile'] = "true"; script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; script.async = true; document.head.appendChild(script); }
     script.addEventListener("load", render); render();
     return () => { active = false; script?.removeEventListener("load", render); if (widget) get()?.remove(widget); };
   }, [siteKey]);
