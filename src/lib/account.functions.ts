@@ -56,7 +56,7 @@ export const requestPhoneCode = createServerFn({ method: "POST" })
         secret_hash: await fingerprint(secret, key), phone_hash: phoneHash,
         phone_encrypted: await encryptValue(data.details.phone, key),
         details_encrypted: await encryptValue({ ...data.details, consentAt: new Date().toISOString() }, key),
-        guest_id: currentUser?.is_anonymous || data.changePhone ? currentUser?.id : null,
+        guest_id: currentUser?.is_anonymous || data.changePhone ? (currentUser?.id ?? null) : null,
         otp_type: data.changePhone ? "phone_change" : "sms",
       }).select("id, expires_at").single();
       if (saved.error) return genericError;
@@ -174,7 +174,7 @@ export const exportOwnData = createServerFn({ method: "POST" }).middleware([requ
     context.supabase.from("baptism_requests").select("*").eq("seeker_id", context.userId),
   ]);
   if ([answers, progress, notes, messages, links, sessions, requests].some(r => r.error)) throw new Error("Export unavailable");
-  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue(address_encrypted, key) }, answers: answers.data, progress: progress.data, notes: notes.data, messages: messages.data, mentor_links: links.data, study_sessions: sessions.data, baptism_requests: requests.data };
+  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue<{ street: string; city: string; postal_code: string; country: string }>(address_encrypted, key) }, answers: answers.data, progress: progress.data, notes: notes.data, messages: messages.data, mentor_links: links.data, study_sessions: sessions.data, baptism_requests: requests.data };
 });
 
 export const withdrawSensitiveConsent = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {

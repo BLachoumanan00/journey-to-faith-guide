@@ -70,9 +70,9 @@ export function PhoneAuthPage({ changePhone = false }: { changePhone?: boolean }
         <PhoneAccountForm value={details} onChange={setDetails} errors={errors} countryCode={country} setCountryCode={setCountry} />
         <div className="space-y-4 border-t border-border pt-5">
           <label className="flex items-start gap-3 text-xs leading-relaxed"><input type="checkbox" checked={details.privacy} onChange={e => setDetails({ ...details, privacy: e.target.checked })} className="mt-0.5 size-4 shrink-0 accent-primary" required /><span>{fr ? "J'ai lu la " : "I have read the "}<Link to={fr ? "/confidentialite" : "/privacy"} target="_blank" rel="noopener noreferrer" className="text-ribbon underline">{fr ? "Politique de confidentialité" : "Privacy Policy"}</Link>{fr ? " et j'accepte que mon nom, mon adresse et mon numéro de téléphone soient collectés pour créer mon compte." : " and agree that my name, address and phone number are collected to create my account."}</span></label>
-          {errors.privacy && <p className="text-xs text-destructive">{errors.privacy}</p>}
+          {errors['privacy'] && <p className="text-xs text-destructive">{errors['privacy']}</p>}
           <label className="flex items-start gap-3 text-xs leading-relaxed"><input type="checkbox" checked={details.sensitive} onChange={e => setDetails({ ...details, sensitive: e.target.checked })} className="mt-0.5 size-4 shrink-0 accent-primary" required /><span>{fr ? "J'accepte explicitement que mes réponses aux leçons, qui peuvent révéler mes convictions religieuses, soient enregistrées et partagées avec mon mentor si j'en choisis un." : "I explicitly agree that my lesson responses, which may reveal my religious beliefs, are saved and shared with my mentor if I choose one."}</span></label>
-          {errors.sensitive && <p className="text-xs text-destructive">{errors.sensitive}</p>}
+          {errors['sensitive'] && <p className="text-xs text-destructive">{errors['sensitive']}</p>}
         </div>
         {config.data?.siteKey && <BotCheck key={captchaKey} siteKey={config.data.siteKey} onToken={setCaptcha} />}
         {config.isPending ? <p className="text-sm text-clay">{fr ? "Vérification de la disponibilité…" : "Checking availability…"}</p> : !config.data?.ready ? <p role="status" className="text-sm text-clay">{message("setup")}</p> : null}
