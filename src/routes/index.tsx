@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { useLang } from "@/lib/i18n";
 import appIcon from "@/assets/app-icon.png.asset.json";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Un compagnon d'étude biblique en 24 leçons, à votre rythme, avec un mentor si vous le souhaitez.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Landing,
@@ -84,12 +87,7 @@ function Landing() {
         </ol>
 
         <div className="mt-auto pt-12">
-          <Link
-            to="/parcours"
-            className="block w-full rounded-lg bg-ribbon px-4 py-3.5 text-center text-sm font-medium text-paper"
-          >
-            {fr ? "Commencer la première leçon" : "Start the first lesson"}
-          </Link>
+          <Button asChild className="h-12 w-full"><Link to="/auth">{fr ? "Créer ou retrouver mon compte" : "Create or find my account"}</Link></Button>
           <p className="mt-3 text-center text-xs text-clay">
             {fr ? "Gratuit. À votre rythme. Sans pression." : "Free. At your pace. No pressure."}
           </p>
