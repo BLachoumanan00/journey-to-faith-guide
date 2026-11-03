@@ -34,10 +34,10 @@ export default defineConfig({
             {
               // Pages: always try the network first, fall back to the last saved copy.
               urlPattern: ({ request, url }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
+                request.mode === "navigate" && !url.pathname.startsWith("/~oauth") && !["/auth", "/profil", "/admin"].some(path => url.pathname.startsWith(path)),
               handler: "NetworkFirst",
               options: {
-                cacheName: "pages",
+                cacheName: "public-pages-v2",
                 networkTimeoutSeconds: 4,
                 expiration: { maxEntries: 60 },
               },
@@ -49,12 +49,12 @@ export default defineConfig({
               options: { cacheName: "assets", expiration: { maxEntries: 300 } },
             },
             {
-              // Lessons, questions, progress reads from the backend.
+              // Public course material only: never cache personal records across sessions.
               urlPattern: ({ url, request }) =>
-                request.method === "GET" && url.pathname.startsWith("/rest/v1/"),
+                request.method === "GET" && ["/rest/v1/lessons", "/rest/v1/lesson_questions"].includes(url.pathname),
               handler: "NetworkFirst",
               options: {
-                cacheName: "lesson-data",
+                cacheName: "public-lesson-data-v2",
                 networkTimeoutSeconds: 5,
                 expiration: { maxEntries: 400 },
               },

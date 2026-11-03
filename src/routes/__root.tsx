@@ -123,6 +123,8 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    // Remove legacy caches that could contain private progress or account pages.
+    if ("caches" in window) void Promise.all(["pages", "lesson-data"].map(name => caches.delete(name)));
     registerOfflineSupport();
   }, []);
 
@@ -130,7 +132,8 @@ function RootComponent() {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      if (event === "SIGNED_OUT") queryClient.clear();
+      else queryClient.invalidateQueries();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
