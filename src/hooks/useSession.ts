@@ -28,28 +28,20 @@ export function useSessionUser() {
   return { user, ready };
 }
 
-/** Ensures a profile row exists for the signed-in user, then returns it. */
+/** Profiles and roles are created only after verified account registration. */
 export function useProfile(userId?: string) {
   return useQuery({
     queryKey: ["profile", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
+      if (!userId) throw new Error("Sign in required");
       const { data, error } = await supabase
         .from("profiles")
         .select("id, display_name, preferred_lang, invite_code, reminders_enabled")
-        .eq("id", userId!)
+        .eq("id", userId)
         .maybeSingle();
       if (error) throw error;
-      if (data) return data;
-
-      const { data: created, error: insertError } = await supabase
-        .from("profiles")
-        .insert({ id: userId! })
-        .select("id, display_name, preferred_lang, invite_code, reminders_enabled")
-        .single();
-      if (insertError) throw insertError;
-      await supabase.from("user_roles").insert({ user_id: userId!, role: "seeker" });
-      return created;
+      return data;
     },
   });
 }
@@ -59,7 +51,8 @@ export function useRoles(userId?: string) {
     queryKey: ["roles", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId!);
+      if (!userId) throw new Error("Sign in required");
+      const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
       if (error) throw error;
       return (data ?? []).map((r) => r.role as "seeker" | "mentor" | "admin");
     },
