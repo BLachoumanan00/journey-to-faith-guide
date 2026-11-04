@@ -1,6 +1,7 @@
 import { getCountries, getCountryCallingCode, parsePhoneNumberFromString, type CountryCode } from "libphonenumber-js/max";
 import { Input } from "@/components/ui/input";
 import { useLang } from "@/lib/i18n";
+import { useEffect, useState } from "react";
 
 export type DetailsDraft = { full_name: string; street: string; city: string; postal_code: string; country: string; phone: string; privacy: boolean; sensitive: boolean };
 export const emptyDetails: DetailsDraft = { full_name: "", street: "", city: "", postal_code: "", country: "", phone: "", privacy: false, sensitive: false };
@@ -10,7 +11,9 @@ export function PhoneAccountForm({ value, onChange, errors = {}, countryCode, se
   value: DetailsDraft; onChange: (value: DetailsDraft) => void; errors?: Record<string, string>; countryCode: CountryCode; setCountryCode: (c: CountryCode) => void; phone?: boolean;
 }) {
   const { lang } = useLang(); const fr = lang === "fr";
-  const names = new Intl.DisplayNames([lang], { type: "region" });
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const names = hydrated ? new Intl.DisplayNames([lang], { type: "region" }) : null;
   const field = (key: "full_name" | "street" | "city" | "postal_code" | "country", label: string, autoComplete: string, maxLength: number) => (
     <div className="min-w-0 space-y-2" key={key}>
       <label htmlFor={`account-${key}`} className="text-sm font-medium">{label} <span className="text-ribbon" aria-hidden="true">*</span></label>
@@ -25,7 +28,7 @@ export function PhoneAccountForm({ value, onChange, errors = {}, countryCode, se
     <div className="space-y-2"><label htmlFor="account-country" className="text-sm font-medium">{fr ? "Pays" : "Country"} <span className="text-ribbon">*</span></label>
       <select id="account-country" value={value.country} onChange={e => onChange({ ...value, country: e.target.value })} required autoComplete="country-name" className="h-11 w-full rounded-md border border-input bg-card px-3 text-sm">
         <option value="">{fr ? "Choisir un pays" : "Select country"}</option>
-        {getCountries().map(c => <option key={c} value={names.of(c)}>{names.of(c)}</option>)}
+        {getCountries().map(c => <option key={c} value={names?.of(c) ?? c}>{names?.of(c) ?? c}</option>)}
       </select>{errors['country'] && <p className="text-xs text-destructive">{errors['country']}</p>}
     </div>
     {phone && <div className="space-y-2"><label htmlFor="account-phone" className="text-sm font-medium">{fr ? "Numéro de téléphone" : "Phone number"} <span className="text-ribbon">*</span></label>
