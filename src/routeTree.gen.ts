@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChangerTelephoneRouteImport } from './routes/changer-telephone'
 import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBaptemeRouteImport } from './routes/_authenticated/bapteme'
 import { Route as AuthenticatedEtudeRouteImport } from './routes/_authenticated/etude'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
@@ -52,6 +53,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBaptemeRoute = AuthenticatedBaptemeRouteImport.update({
   id: '/bapteme',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/changer-telephone': typeof ChangerTelephoneRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/privacy': typeof PrivacyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/bapteme': typeof AuthenticatedBaptemeRoute
   '/etude': typeof AuthenticatedEtudeRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/changer-telephone': typeof ChangerTelephoneRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/privacy': typeof PrivacyRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/bapteme': typeof AuthenticatedBaptemeRoute
   '/etude': typeof AuthenticatedEtudeRoute
   '/journal': typeof AuthenticatedJournalRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/changer-telephone': typeof ChangerTelephoneRoute
   '/confidentialite': typeof ConfidentialiteRoute
   '/privacy': typeof PrivacyRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/bapteme': typeof AuthenticatedBaptemeRoute
   '/_authenticated/etude': typeof AuthenticatedEtudeRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/changer-telephone'
     | '/confidentialite'
     | '/privacy'
+    | '/admin'
     | '/bapteme'
     | '/etude'
     | '/journal'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/changer-telephone'
     | '/confidentialite'
     | '/privacy'
+    | '/admin'
     | '/bapteme'
     | '/etude'
     | '/journal'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/changer-telephone'
     | '/confidentialite'
     | '/privacy'
+    | '/_authenticated/admin'
     | '/_authenticated/bapteme'
     | '/_authenticated/etude'
     | '/_authenticated/journal'
@@ -245,6 +257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/bapteme': {
       id: '/_authenticated/bapteme'
       path: '/bapteme'
@@ -305,6 +324,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBaptemeRoute: typeof AuthenticatedBaptemeRoute
   AuthenticatedEtudeRoute: typeof AuthenticatedEtudeRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
@@ -316,6 +336,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBaptemeRoute: AuthenticatedBaptemeRoute,
   AuthenticatedEtudeRoute: AuthenticatedEtudeRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,

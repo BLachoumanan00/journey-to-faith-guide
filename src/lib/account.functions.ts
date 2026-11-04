@@ -6,6 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { detailsSchema, addressSchema, POLICY_VERSION, OTP_SECONDS, csvRows } from "./account-rules";
 import type { AccountDetails } from "./account-rules";
 import { encryptValue, decryptValue, fingerprint } from "./account-crypto";
+import { collectPages } from "./pagination";
 
 function authClient(url: string, key: string, token?: string) {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: {
@@ -19,7 +20,7 @@ const genericError = { ok: false as const, error: "unavailable" };
 export const phoneAuthConfig = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeader("Cache-Control", "no-store");
   const siteKey = process.env['TURNSTILE_SITE_KEY'];
-  return { siteKey: siteKey ?? null, ready: Boolean(siteKey && process.env['TURNSTILE_SECRET_KEY'] && process.env['ACCOUNT_DATA_KEY']) };
+  return { siteKey: siteKey ?? null, ready: Boolean(siteKey && process.env['TURNSTILE_SECRET_KEY'] && process.env['ACCOUNT_DATA_KEY'] && process.env['PHONE_AUTH_SETUP_VERIFIED'] === "true") };
 });
 
 export const requestPhoneCode = createServerFn({ method: "POST" })
@@ -30,7 +31,7 @@ export const requestPhoneCode = createServerFn({ method: "POST" })
       const key = process.env['ACCOUNT_DATA_KEY'];
       const captchaKey = process.env['TURNSTILE_SECRET_KEY'];
       const url = process.env['SUPABASE_URL']; const publicKey = process.env['SUPABASE_PUBLISHABLE_KEY'];
-      if (!key || !captchaKey || !url || !publicKey) return { ok: false as const, error: "setup" };
+      if (!key || !captchaKey || !url || !publicKey || process.env['PHONE_AUTH_SETUP_VERIFIED'] !== "true") return { ok: false as const, error: "setup" };
       const request = getRequest();
       // Only the platform-controlled Cloudflare header is trusted. Never trust client-supplied X-Forwarded-For.
       const ip = request.headers.get("cf-connecting-ip");
@@ -76,7 +77,7 @@ export const verifyPhoneCode = createServerFn({ method: "POST" }).inputValidator
     setResponseHeader("Cache-Control", "no-store");
     try {
       const key = process.env['ACCOUNT_DATA_KEY']; const url = process.env['SUPABASE_URL']; const publicKey = process.env['SUPABASE_PUBLISHABLE_KEY'];
-      if (!key || !url || !publicKey) return genericError;
+      if (!key || !url || !publicKey || process.env['PHONE_AUTH_SETUP_VERIFIED'] !== "true") return genericError;
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const hash = await fingerprint(data.secret, key);
       const claimed = await supabaseAdmin.rpc("claim_phone_attempt", { _id: data.id, _secret_hash: hash });
@@ -164,17 +165,17 @@ export const exportOwnData = createServerFn({ method: "POST" }).middleware([requ
   const row = await context.supabase.from("users").select("*").eq("id", context.userId).single();
   if (row.error) throw new Error("Account unavailable");
   const { phone_encrypted, address_encrypted, phone_hash: _hash, ...account } = row.data;
+  const read = async (table: "answers" | "progress" | "notes" | "lesson_messages" | "mentor_links" | "study_sessions" | "baptism_requests", filter: string) => collectPages(async (from, to) => {
+    const result = await context.supabase.from(table).select("*").or(filter).order("id").range(from, to);
+    if (result.error) throw new Error("Export unavailable");
+    return result.data ?? [];
+  });
   const [answers, progress, notes, messages, links, sessions, requests] = await Promise.all([
-    context.supabase.from("answers").select("*").eq("user_id", context.userId),
-    context.supabase.from("progress").select("*").eq("user_id", context.userId),
-    context.supabase.from("notes").select("*").eq("user_id", context.userId),
-    context.supabase.from("lesson_messages").select("*").or(`seeker_id.eq.${context.userId},author_id.eq.${context.userId}`),
-    context.supabase.from("mentor_links").select("*").or(`seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`),
-    context.supabase.from("study_sessions").select("*").or(`seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`),
-    context.supabase.from("baptism_requests").select("*").eq("seeker_id", context.userId),
+    read("answers", `user_id.eq.${context.userId}`), read("progress", `user_id.eq.${context.userId}`), read("notes", `user_id.eq.${context.userId}`),
+    read("lesson_messages", `seeker_id.eq.${context.userId},author_id.eq.${context.userId}`), read("mentor_links", `seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`),
+    read("study_sessions", `seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`), read("baptism_requests", `seeker_id.eq.${context.userId}`),
   ]);
-  if ([answers, progress, notes, messages, links, sessions, requests].some(r => r.error)) throw new Error("Export unavailable");
-  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue<{ street: string; city: string; postal_code: string; country: string }>(address_encrypted, key) }, answers: answers.data, progress: progress.data, notes: notes.data, messages: messages.data, mentor_links: links.data, study_sessions: sessions.data, baptism_requests: requests.data };
+  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue<{ street: string; city: string; postal_code: string; country: string }>(address_encrypted, key) }, answers, progress, notes, messages, mentor_links: links, study_sessions: sessions, baptism_requests: requests };
 });
 
 export const withdrawSensitiveConsent = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
