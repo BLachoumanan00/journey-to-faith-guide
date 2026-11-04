@@ -10,3 +10,6 @@
 <!-- LOVABLE:END -->
 
 - Offline support: vite-plugin-pwa generateSW (sw.js in dist/client), registered only via src/lib/register-sw.ts, which refuses dev/preview/iframe — keeps previews free of stale caches.
+- Account operations use authenticated TanStack server functions, with server-only encryption and privileged writes after ownership or role verification — personal data never belongs in public loaders or offline caches.
+- Offline runtime caches only public lesson material and Bible lookups; exclude account/auth/admin pages and remove legacy private-data caches — device account changes must not expose another user's data.
+- SMS sign-in must fail closed until delivery, CAPTCHA and provider-side verification limits are configured and verified — application limits alone do not secure direct auth API calls.
