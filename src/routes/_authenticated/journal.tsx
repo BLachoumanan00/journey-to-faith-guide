@@ -4,11 +4,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { useLang } from "@/lib/i18n";
 import { useSessionUser } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/journal")({
+  head: () => pageMeta("Mon journal — Bible en Main", "Vos réflexions, prières et questions personnelles au fil des leçons Bible en Main."),
   component: JournalPage,
 });
 

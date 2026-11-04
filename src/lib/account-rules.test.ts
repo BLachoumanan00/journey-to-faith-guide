@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { detailsSchema, canAttempt, OTP_SECONDS, RESEND_SECONDS, MAX_OTP_ATTEMPTS, csvCell } from "./account-rules";
+import { detailsSchema, canAttempt, OTP_SECONDS, RESEND_SECONDS, MAX_OTP_ATTEMPTS, PHONE_REQUESTS_PER_HOUR, IP_REQUESTS_PER_HOUR, csvCell } from "./account-rules";
 import { encryptValue, decryptValue, fingerprint } from "./account-crypto";
 const valid = { full_name: "Marie Dupont", street: "10 Rue des Fleurs", city: "Paris", postal_code: "75001", country: "France", phone: "+33612345678", privacy: true, sensitive: true };
 describe("Required account rules", () => {
@@ -11,6 +11,7 @@ describe("Required account rules", () => {
   it("expires codes after exactly five minutes", () => { expect(OTP_SECONDS).toBe(300); expect(canAttempt(0, 300000, 299999)).toBe(true); expect(canAttempt(0, 300000, 300000)).toBe(false); });
   it("allows no more than five verification attempts", () => { expect(MAX_OTP_ATTEMPTS).toBe(5); expect(canAttempt(4, 10000, 0)).toBe(true); expect(canAttempt(5, 10000, 0)).toBe(false); });
   it("sets a resend cooldown", () => { expect(RESEND_SECONDS).toBe(60); });
+  it("limits hourly requests by phone and IP", () => { expect(PHONE_REQUESTS_PER_HOUR).toBe(5); expect(IP_REQUESTS_PER_HOUR).toBe(20); });
   it("encrypts phone and address with authenticated randomized encryption", async () => { const key = "test-only-secret"; const a = await encryptValue(valid.phone, key); const b = await encryptValue(valid.phone, key); expect(a).not.toContain(valid.phone); expect(a).not.toBe(b); expect(await decryptValue(a, key)).toBe(valid.phone); const address = await encryptValue({ street: valid.street }, key); expect(address).not.toContain(valid.street); expect(await decryptValue(address, key)).toEqual({ street: valid.street }); await expect(decryptValue(a, "wrong-key")).rejects.toThrow(); });
   it("uses keyed fingerprints rather than plaintext phone lookups", async () => { expect(await fingerprint(valid.phone, "key1")).not.toBe(await fingerprint(valid.phone, "key2")); });
   it("neutralizes spreadsheet formulas in user exports", () => { expect(csvCell("=1+1")).toBe('"\'=1+1"'); expect(csvCell('a"b')).toBe('"a""b"'); });

@@ -4,12 +4,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { useLang } from "@/lib/i18n";
 import { useSessionUser } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { baptismUnlocked, fetchLessons, fetchProgress } from "@/lib/study";
 
 export const Route = createFileRoute("/_authenticated/bapteme")({
+  head: () => pageMeta("Le baptême — Bible en Main", "Réfléchissez à votre décision et demandez un échange personnel sur le baptême."),
   component: BaptismPage,
 });
 
