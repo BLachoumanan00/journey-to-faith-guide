@@ -2,11 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { useLang } from "@/lib/i18n";
 import { useSessionUser } from "@/hooks/useSession";
 import { CORE_LESSONS, fetchLessons, fetchProgress, lessonTitle, statusOf } from "@/lib/study";
 
 export const Route = createFileRoute("/_authenticated/lecons/")({
+  head: () => pageMeta("Les leçons — Bible en Main", "Parcourez les leçons et questions du cours biblique Bible en Main."),
   component: LessonList,
 });
 

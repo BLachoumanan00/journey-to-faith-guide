@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { VerseChip } from "@/components/VerseChip";
 import { LessonAsk } from "@/components/LessonAsk";
 import { useLang } from "@/lib/i18n";
@@ -27,6 +28,7 @@ import {
 
 
 export const Route = createFileRoute("/_authenticated/lecons/$position")({
+  head: ({ params }) => pageMeta(`Leçon ${params.position} — Bible en Main`, `Étudiez les passages bibliques, questions et explications de la leçon ${params.position} de Bible en Main.`),
   component: LessonPage,
 });
 

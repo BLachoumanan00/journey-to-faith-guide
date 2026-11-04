@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { useLang } from "@/lib/i18n";
 import { useProfile, useSessionUser } from "@/hooks/useSession";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/lib/study";
 
 export const Route = createFileRoute("/_authenticated/parcours")({
+  head: () => pageMeta("Mon parcours — Bible en Main", "Retrouvez votre progression et votre prochaine leçon biblique dans Bible en Main."),
   component: Journey,
 });
 

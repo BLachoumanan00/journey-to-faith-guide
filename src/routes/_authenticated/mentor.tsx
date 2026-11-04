@@ -4,11 +4,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { pageMeta } from "@/lib/page-meta";
 import { useLang } from "@/lib/i18n";
 import { useProfile, useRoles, useSessionUser } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/mentor")({
+  head: () => pageMeta("Mon mentor — Bible en Main", "Vos échanges et votre accompagnement personnel dans Bible en Main."),
   component: MentorPage,
 });
 
