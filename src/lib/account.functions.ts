@@ -101,7 +101,7 @@ export const verifyPhoneCode = createServerFn({ method: "POST" }).inputValidator
       const now = new Date().toISOString();
       const saved = existing.data
         ? await supabaseAdmin.from("users").update({ last_login: now, phone_encrypted: challenge.phone_encrypted, phone_hash: challenge.phone_hash, consent_privacy_at: details.consentAt, consent_sensitive_at: details.consentAt, policy_version: POLICY_VERSION }).eq("id", user.id)
-        : await supabaseAdmin.from("users").insert({ id: user.id, full_name: details.full_name, phone_hash: challenge.phone_hash, phone_encrypted: challenge.phone_encrypted, address_encrypted: await encryptValue({ street: details.street, city: details.city, postal_code: details.postal_code, country: details.country }, key), consent_privacy_at: details.consentAt, consent_sensitive_at: details.consentAt, policy_version: POLICY_VERSION, last_login: now });
+        : await supabaseAdmin.from("users").insert({ id: user.id, full_name: details.full_name, phone_hash: challenge.phone_hash, phone_encrypted: challenge.phone_encrypted, address_encrypted: await encryptValue({ street: details.street, city: details.city, country: details.country }, key), consent_privacy_at: details.consentAt, consent_sensitive_at: details.consentAt, policy_version: POLICY_VERSION, last_login: now });
       if (saved.error) return genericError;
       const profile = await supabaseAdmin.from("profiles").select("id").eq("id", user.id).maybeSingle();
       if (!profile.data) await supabaseAdmin.from("profiles").insert({ id: user.id, display_name: details.full_name });
@@ -125,7 +125,7 @@ export const getAccount = createServerFn({ method: "POST" }).middleware([require
   if (row.error) throw new Error("Account temporarily unavailable");
   if (!row.data) return null;
   const { phone_encrypted, phone_hash: _hash, address_encrypted, ...record } = row.data;
-  return { ...record, phone: await decryptValue<string>(phone_encrypted, key), ...await decryptValue<{ street: string; city: string; postal_code: string; country: string }>(address_encrypted, key) };
+  return { ...record, phone: await decryptValue<string>(phone_encrypted, key), ...await decryptValue<{ street: string; city: string; country: string }>(address_encrypted, key) };
 });
 
 export const updateAccount = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
@@ -175,7 +175,7 @@ export const exportOwnData = createServerFn({ method: "POST" }).middleware([requ
     read("lesson_messages", `seeker_id.eq.${context.userId},author_id.eq.${context.userId}`), read("mentor_links", `seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`),
     read("study_sessions", `seeker_id.eq.${context.userId},mentor_id.eq.${context.userId}`), read("baptism_requests", `seeker_id.eq.${context.userId}`),
   ]);
-  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue<{ street: string; city: string; postal_code: string; country: string }>(address_encrypted, key) }, answers, progress, notes, messages, mentor_links: links, study_sessions: sessions, baptism_requests: requests };
+  return { account: { ...account, phone: await decryptValue<string>(phone_encrypted, key), address: await decryptValue<{ street: string; city: string; country: string }>(address_encrypted, key) }, answers, progress, notes, messages, mentor_links: links, study_sessions: sessions, baptism_requests: requests };
 });
 
 export const withdrawSensitiveConsent = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
