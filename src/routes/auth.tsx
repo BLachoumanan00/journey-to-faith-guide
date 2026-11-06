@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PhoneAuthPage } from "@/components/PhoneAuthPage";
+import { EmailAuthPage } from "@/components/EmailAuthPage";
 import { pageMeta } from "@/lib/page-meta";
 export const Route = createFileRoute("/auth")({
-  head: () => pageMeta("Connexion par SMS — Bible en Main", "Créez votre compte Bible en Main ou retrouvez votre parcours avec un code SMS, sans mot de passe."),
-  component: PhoneAuthPage,
+  head: () => pageMeta("Connexion — Bible en Main", "Connectez-vous à Bible en Main sans mot de passe, par e-mail ou avec Google."),
+  component: EmailAuthPage,
 });

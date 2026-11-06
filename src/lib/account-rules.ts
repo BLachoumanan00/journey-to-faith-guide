@@ -16,6 +16,7 @@ export const detailsSchema = z.object({
 });
 export type AccountDetails = z.infer<typeof detailsSchema>;
 export const addressSchema = detailsSchema.pick({ full_name: true, street: true, city: true, country: true });
+export const profileSchema = detailsSchema.omit({ privacy: true, sensitive: true });
 export function canAttempt(attempts: number, expiresAt: number, now: number) { return attempts < MAX_OTP_ATTEMPTS && now < expiresAt; }
 export function csvCell(value: unknown) {
   const text = String(value ?? "");

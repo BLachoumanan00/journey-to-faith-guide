@@ -16,7 +16,6 @@ import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBaptemeRouteImport } from './routes/_authenticated/bapteme'
-import { Route as AuthenticatedChangerTelephoneRouteImport } from './routes/_authenticated/changer-telephone'
 import { Route as AuthenticatedEtudeRouteImport } from './routes/_authenticated/etude'
 import { Route as AuthenticatedJournalRouteImport } from './routes/_authenticated/journal'
 import { Route as AuthenticatedMentorRouteImport } from './routes/_authenticated/mentor'
@@ -59,12 +58,6 @@ const AuthenticatedBaptemeRoute = AuthenticatedBaptemeRouteImport.update({
   path: '/bapteme',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedChangerTelephoneRoute =
-  AuthenticatedChangerTelephoneRouteImport.update({
-    id: '/changer-telephone',
-    path: '/changer-telephone',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedEtudeRoute = AuthenticatedEtudeRouteImport.update({
   id: '/etude',
   path: '/etude',
@@ -110,7 +103,6 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/bapteme': typeof AuthenticatedBaptemeRoute
-  '/changer-telephone': typeof AuthenticatedChangerTelephoneRoute
   '/etude': typeof AuthenticatedEtudeRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
@@ -126,7 +118,6 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/bapteme': typeof AuthenticatedBaptemeRoute
-  '/changer-telephone': typeof AuthenticatedChangerTelephoneRoute
   '/etude': typeof AuthenticatedEtudeRoute
   '/journal': typeof AuthenticatedJournalRoute
   '/mentor': typeof AuthenticatedMentorRoute
@@ -144,7 +135,6 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/bapteme': typeof AuthenticatedBaptemeRoute
-  '/_authenticated/changer-telephone': typeof AuthenticatedChangerTelephoneRoute
   '/_authenticated/etude': typeof AuthenticatedEtudeRoute
   '/_authenticated/journal': typeof AuthenticatedJournalRoute
   '/_authenticated/mentor': typeof AuthenticatedMentorRoute
@@ -162,7 +152,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/admin'
     | '/bapteme'
-    | '/changer-telephone'
     | '/etude'
     | '/journal'
     | '/mentor'
@@ -178,7 +167,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/admin'
     | '/bapteme'
-    | '/changer-telephone'
     | '/etude'
     | '/journal'
     | '/mentor'
@@ -195,7 +183,6 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/_authenticated/admin'
     | '/_authenticated/bapteme'
-    | '/_authenticated/changer-telephone'
     | '/_authenticated/etude'
     | '/_authenticated/journal'
     | '/_authenticated/mentor'
@@ -264,13 +251,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBaptemeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/changer-telephone': {
-      id: '/_authenticated/changer-telephone'
-      path: '/changer-telephone'
-      fullPath: '/changer-telephone'
-      preLoaderRoute: typeof AuthenticatedChangerTelephoneRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/etude': {
       id: '/_authenticated/etude'
       path: '/etude'
@@ -326,7 +306,6 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedBaptemeRoute: typeof AuthenticatedBaptemeRoute
-  AuthenticatedChangerTelephoneRoute: typeof AuthenticatedChangerTelephoneRoute
   AuthenticatedEtudeRoute: typeof AuthenticatedEtudeRoute
   AuthenticatedJournalRoute: typeof AuthenticatedJournalRoute
   AuthenticatedMentorRoute: typeof AuthenticatedMentorRoute
@@ -339,7 +318,6 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedBaptemeRoute: AuthenticatedBaptemeRoute,
-  AuthenticatedChangerTelephoneRoute: AuthenticatedChangerTelephoneRoute,
   AuthenticatedEtudeRoute: AuthenticatedEtudeRoute,
   AuthenticatedJournalRoute: AuthenticatedJournalRoute,
   AuthenticatedMentorRoute: AuthenticatedMentorRoute,

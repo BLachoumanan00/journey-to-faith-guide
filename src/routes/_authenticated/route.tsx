@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
     const user = data.session?.user;
-    if (!user || user.is_anonymous || !user.phone) throw redirect({ to: "/auth" });
+    if (!user || user.is_anonymous) throw redirect({ to: "/auth" });
     const account = await supabase.from("users").select("id, policy_version").eq("id", user.id).maybeSingle();
     if (account.error) throw new Error("Compte temporairement indisponible");
     if (!account.data || account.data.policy_version !== POLICY_VERSION) throw redirect({ to: "/auth" });
