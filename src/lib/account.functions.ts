@@ -3,8 +3,7 @@ import { getRequest, setResponseHeader } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { detailsSchema, addressSchema, POLICY_VERSION, OTP_SECONDS, csvRows } from "./account-rules";
-import type { AccountDetails } from "./account-rules";
+import { detailsSchema, profileSchema, POLICY_VERSION, csvRows } from "./account-rules";
 import { encryptValue, decryptValue, fingerprint } from "./account-crypto";
 import { collectPages } from "./pagination";
 
@@ -14,108 +13,51 @@ function authClient(url: string, key: string, token?: string) {
     fetch: (input, init) => { const headers = new Headers(init?.headers); if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization"); headers.set("apikey", key); return fetch(input, { ...init, headers }); },
   } });
 }
-const challengeSchema = z.object({ id: z.string().uuid(), secret: z.string().uuid(), code: z.string().regex(/^\d{4,8}$/) });
 const genericError = { ok: false as const, error: "unavailable" };
 
-export const phoneAuthConfig = createServerFn({ method: "GET" }).handler(async () => {
-  setResponseHeader("Cache-Control", "no-store");
-  const siteKey = process.env['TURNSTILE_SITE_KEY'];
-  return { siteKey: siteKey ?? null, ready: Boolean(siteKey && process.env['TURNSTILE_SECRET_KEY'] && process.env['ACCOUNT_DATA_KEY'] && process.env['PHONE_AUTH_SETUP_VERIFIED'] === "true") };
-});
-
-export const requestPhoneCode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => z.object({ details: detailsSchema, captcha: z.string().min(1).max(2048), changePhone: z.boolean().optional() }).parse(input))
-  .handler(async ({ data }) => {
-    setResponseHeader("Cache-Control", "no-store");
-    try {
-      const key = process.env['ACCOUNT_DATA_KEY'];
-      const captchaKey = process.env['TURNSTILE_SECRET_KEY'];
-      const url = process.env['SUPABASE_URL']; const publicKey = process.env['SUPABASE_PUBLISHABLE_KEY'];
-      if (!key || !captchaKey || !url || !publicKey || process.env['PHONE_AUTH_SETUP_VERIFIED'] !== "true") return { ok: false as const, error: "setup" };
-      const request = getRequest();
-      // Only the platform-controlled Cloudflare header is trusted. Never trust client-supplied X-Forwarded-For.
-      const ip = request.headers.get("cf-connecting-ip");
-      if (!ip && !new URL(request.url).hostname.match(/^(localhost|127\.0\.0\.1)$/)) return { ok: false as const, error: "setup" };
-      const body = new URLSearchParams({ secret: captchaKey, response: data.captcha });
-      if (ip) body.set("remoteip", ip);
-      const captchaResponse = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
-      const captchaResult = await captchaResponse.json() as { success?: boolean; hostname?: string };
-      if (!captchaResponse.ok || !captchaResult.success || captchaResult.hostname !== new URL(request.url).hostname) return { ok: false as const, error: "captcha" };
-      const phoneHash = await fingerprint(`phone:${data.details.phone}`, key);
-      const ipHash = await fingerprint(`ip:${ip ?? "local-development"}`, key);
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const allowed = await supabaseAdmin.rpc("claim_phone_request", { _phone_hash: phoneHash, _ip_hash: ipHash });
-      if (allowed.error) return genericError;
-      if (!allowed.data) return { ok: false as const, error: "limited" };
-      const bearer = request.headers.get("authorization")?.replace(/^Bearer /, "");
-      const publicAuth = authClient(url, publicKey, bearer);
-      const current = bearer ? await publicAuth.auth.getUser(bearer) : null;
-      const currentUser = current?.data.user;
-      if (data.changePhone && (!currentUser || currentUser.is_anonymous || !currentUser.phone)) return { ok: false as const, error: "session" };
-      const secret = crypto.randomUUID();
-      const saved = await supabaseAdmin.from("phone_auth_challenges").insert({
-        secret_hash: await fingerprint(secret, key), phone_hash: phoneHash,
-        phone_encrypted: await encryptValue(data.details.phone, key),
-        details_encrypted: await encryptValue({ ...data.details, consentAt: new Date().toISOString() }, key),
-        guest_id: currentUser?.is_anonymous || data.changePhone ? (currentUser?.id ?? null) : null,
-        otp_type: data.changePhone ? "phone_change" : "sms",
-      }).select("id, expires_at").single();
-      if (saved.error) return genericError;
-      const sent = data.changePhone
-        ? await publicAuth.auth.updateUser({ phone: data.details.phone })
-        : await publicAuth.auth.signInWithOtp({ phone: data.details.phone, options: { shouldCreateUser: true } });
-      if (sent.error) {
-        await supabaseAdmin.from("phone_auth_challenges").delete().eq("id", saved.data.id);
-        return { ok: false as const, error: sent.error.status === 429 ? "limited" : "sms" };
-      }
-      return { ok: true as const, id: saved.data.id, secret, expiresAt: saved.data.expires_at, seconds: OTP_SECONDS };
-    } catch { return genericError; }
-  });
-
-export const verifyPhoneCode = createServerFn({ method: "POST" }).inputValidator((input: unknown) => challengeSchema.parse(input))
-  .handler(async ({ data }) => {
+export const completeProfile = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ details: detailsSchema, guestToken: z.string().max(4096).optional() }).parse(input))
+  .handler(async ({ data, context }) => {
     setResponseHeader("Cache-Control", "no-store");
     try {
       const key = process.env['ACCOUNT_DATA_KEY']; const url = process.env['SUPABASE_URL']; const publicKey = process.env['SUPABASE_PUBLISHABLE_KEY'];
-      if (!key || !url || !publicKey || process.env['PHONE_AUTH_SETUP_VERIFIED'] !== "true") return genericError;
+      if (!key || !url || !publicKey) return genericError;
+      const current = await context.supabase.auth.getUser();
+      const user = current.data.user;
+      if (current.error || !user || user.is_anonymous || !user.email) return { ok: false as const, error: "session" };
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const hash = await fingerprint(data.secret, key);
-      const claimed = await supabaseAdmin.rpc("claim_phone_attempt", { _id: data.id, _secret_hash: hash });
-      const challenge = claimed.data?.[0];
-      if (claimed.error || !challenge) return { ok: false as const, error: "expired" };
-      const phone = await decryptValue<string>(challenge.phone_encrypted, key);
-      const bearer = getRequest().headers.get("authorization")?.replace(/^Bearer /, "");
-      const auth = authClient(url, publicKey, challenge.otp_type === "phone_change" ? bearer : undefined);
-      if (challenge.otp_type === "phone_change") {
-        const current = bearer ? await auth.auth.getUser(bearer) : null;
-        if (!current?.data.user || current.data.user.id !== challenge.guest_id) return { ok: false as const, error: "session" };
-      }
-      const verified = await auth.auth.verifyOtp({ phone, token: data.code, type: challenge.otp_type === "phone_change" ? "phone_change" : "sms" });
-      if (verified.error || !verified.data.user || !verified.data.session || verified.data.user.phone !== phone || verified.data.user.is_anonymous) return { ok: false as const, error: "code", remaining: 5 - challenge.attempts };
-      const consumed = await supabaseAdmin.rpc("finish_phone_challenge", { _id: data.id, _secret_hash: hash });
-      if (consumed.error || !consumed.data) return { ok: false as const, error: "expired" };
-      const user = verified.data.user;
-      const details = await decryptValue<AccountDetails & { consentAt: string }>(challenge.details_encrypted, key);
+      const details = data.details; const now = new Date().toISOString();
+      const phoneHash = await fingerprint(`phone:${details.phone}`, key);
+      const taken = await supabaseAdmin.from("users").select("id").eq("phone_hash", phoneHash).neq("id", user.id).maybeSingle();
+      if (taken.error) return genericError;
+      if (taken.data) return { ok: false as const, error: "phone_taken" };
+      const row = { full_name: details.full_name, phone_hash: phoneHash, phone_encrypted: await encryptValue(details.phone, key), address_encrypted: await encryptValue({ street: details.street, city: details.city, country: details.country }, key), consent_privacy_at: now, consent_sensitive_at: now, policy_version: POLICY_VERSION, last_login: now };
       const existing = await supabaseAdmin.from("users").select("id").eq("id", user.id).maybeSingle();
       if (existing.error) return genericError;
-      const now = new Date().toISOString();
-      const saved = existing.data
-        ? await supabaseAdmin.from("users").update({ last_login: now, phone_encrypted: challenge.phone_encrypted, phone_hash: challenge.phone_hash, consent_privacy_at: details.consentAt, consent_sensitive_at: details.consentAt, policy_version: POLICY_VERSION }).eq("id", user.id)
-        : await supabaseAdmin.from("users").insert({ id: user.id, full_name: details.full_name, phone_hash: challenge.phone_hash, phone_encrypted: challenge.phone_encrypted, address_encrypted: await encryptValue({ street: details.street, city: details.city, country: details.country }, key), consent_privacy_at: details.consentAt, consent_sensitive_at: details.consentAt, policy_version: POLICY_VERSION, last_login: now });
+      const saved = existing.data ? await supabaseAdmin.from("users").update(row).eq("id", user.id) : await supabaseAdmin.from("users").insert({ id: user.id, ...row });
       if (saved.error) return genericError;
       const profile = await supabaseAdmin.from("profiles").select("id").eq("id", user.id).maybeSingle();
       if (!profile.data) await supabaseAdmin.from("profiles").insert({ id: user.id, display_name: details.full_name });
       const role = await supabaseAdmin.from("user_roles").select("id").eq("user_id", user.id).eq("role", "seeker").maybeSingle();
       if (!role.data) await supabaseAdmin.from("user_roles").insert({ user_id: user.id, role: "seeker" });
       let transferred = true;
-      if (challenge.guest_id && challenge.otp_type === "sms" && challenge.guest_id !== user.id) {
-        const result = await supabaseAdmin.rpc("transfer_guest_study", { _guest: challenge.guest_id, _user: user.id });
-        transferred = !result.error;
+      if (data.guestToken) {
+        // Only a verified anonymous device session can hand its progress over.
+        const guest = await authClient(url, publicKey, data.guestToken).auth.getUser(data.guestToken);
+        if (guest.data.user?.is_anonymous && guest.data.user.id !== user.id) {
+          const result = await supabaseAdmin.rpc("transfer_guest_study", { _guest: guest.data.user.id, _user: user.id });
+          transferred = !result.error;
+        }
       }
-      await supabaseAdmin.from("phone_auth_challenges").delete().eq("id", challenge.id);
-      return { ok: true as const, access_token: verified.data.session.access_token, refresh_token: verified.data.session.refresh_token, transferred };
+      return { ok: true as const, transferred };
     } catch { return genericError; }
   });
+
+export const touchLogin = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("users").update({ last_login: new Date().toISOString() }).eq("id", context.userId);
+  return { ok: true };
+});
 
 export const getAccount = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
@@ -129,15 +71,18 @@ export const getAccount = createServerFn({ method: "POST" }).middleware([require
 });
 
 export const updateAccount = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => addressSchema.parse(input)).handler(async ({ data, context }) => {
+  .inputValidator((input: unknown) => profileSchema.parse(input)).handler(async ({ data, context }) => {
     const current = await context.supabase.auth.getUser();
-    if (current.error || !current.data.user?.phone || current.data.user.is_anonymous) throw new Error("Sign in required");
+    if (current.error || !current.data.user || current.data.user.is_anonymous) throw new Error("Sign in required");
     const key = process.env['ACCOUNT_DATA_KEY']; if (!key) throw new Error("Account temporarily unavailable");
     const own = await context.supabase.from("users").select("id").eq("id", context.userId).single();
     if (own.error) throw new Error("Account unavailable");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { full_name, ...address } = data;
-    const result = await supabaseAdmin.from("users").update({ full_name, address_encrypted: await encryptValue(address, key) }).eq("id", context.userId);
+    const { full_name, phone, ...address } = data;
+    const phoneHash = await fingerprint(`phone:${phone}`, key);
+    const taken = await supabaseAdmin.from("users").select("id").eq("phone_hash", phoneHash).neq("id", context.userId).maybeSingle();
+    if (taken.data) throw new Error("Phone number already used");
+    const result = await supabaseAdmin.from("users").update({ full_name, phone_hash: phoneHash, phone_encrypted: await encryptValue(phone, key), address_encrypted: await encryptValue(address, key) }).eq("id", context.userId);
     if (result.error) throw new Error("Could not save account");
     await context.supabase.from("profiles").update({ display_name: full_name }).eq("id", context.userId);
     return { ok: true };
