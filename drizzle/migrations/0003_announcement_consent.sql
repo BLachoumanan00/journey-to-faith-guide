@@ -1,0 +1,2 @@
+ALTER TABLE public.users ADD COLUMN IF NOT EXISTS consent_announcements_at timestamptz;
+COMMENT ON COLUMN public.users.consent_announcements_at IS 'Optional consent to receive Bible en Main announcements; NULL means no consent. Kept separate from account and sensitive study consent.';
