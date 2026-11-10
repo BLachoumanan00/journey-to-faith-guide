@@ -96,7 +96,7 @@ export function EmailAuthPage() {
       const result = await complete({ data: { details: parsed.data, guestToken } });
       if (!result.ok) { setError(result.error === "phone_taken" ? (fr ? "Ce numéro est déjà utilisé par un autre compte." : "This number is already used by another account.") : (fr ? "Impossible d'enregistrer. Réessayez." : "Could not save. Please try again.")); return; }
       sessionStorage.removeItem(GUEST_KEY); await qc.invalidateQueries();
-      if (!result.transferred) { setError(fr ? "Compte créé. Le transfert de votre ancien parcours nécessite notre aide : bibleenmain041@gmail.com." : "Account created. Your previous journey needs help transferring: bibleenmain041@gmail.com."); return; }
+      if (!result.transferred) { setError(fr ? "Compte créé. Le transfert de votre ancien parcours nécessite notre aide : bibleenmain00@gmail.com." : "Account created. Your previous journey needs help transferring: bibleenmain00@gmail.com."); return; }
       setStep("done");
     } catch { setError(fr ? "Impossible d'enregistrer. Réessayez." : "Could not save. Please try again."); } finally { setPending(false); }
   };

@@ -4,7 +4,7 @@
 - [x] Add role-protected contact directory, search and CSV/copy actions.
 - [x] Add optional announcement consent and exclude non-consenting users from broadcast lists.
 - [x] Pass 15 tests and confirm the available preview session cannot access private pages.
-- [ ] Grant admin access to bibleenmain041@gmail.com. Blocked: no verified account exists for that address; user must sign in and complete their account first.
+- [ ] Grant admin access to bibleenmain00@gmail.com. Blocked: no verified account exists for that address; user must sign in and complete their account first.
 - [ ] Verify directory, downloads, clipboard and saved announcement preference end-to-end. Blocked: available preview session redirects to sign-in and no authorized admin account exists.
 
 - [x] SMS details and verification screens, session-driven navigation, legacy guest-transfer implementation.
