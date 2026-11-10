@@ -6,6 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { detailsSchema, profileSchema, POLICY_VERSION, csvRows } from "./account-rules";
 import { encryptValue, decryptValue, fingerprint } from "./account-crypto";
 import { collectPages } from "./pagination";
+import { requireAdminPermission } from "./admin-contacts";
 
 function authClient(url: string, key: string, token?: string) {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: {
@@ -91,7 +92,7 @@ export const updateAccount = createServerFn({ method: "POST" }).middleware([requ
 export const adminUsersCsv = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
   const permission = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-  if (permission.error || permission.data !== true) throw new Error("Administrator access required");
+  requireAdminPermission(permission);
   const key = process.env['ACCOUNT_DATA_KEY']; if (!key) throw new Error("Export unavailable");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const rows: Record<string, unknown>[] = [];
@@ -103,6 +104,38 @@ export const adminUsersCsv = createServerFn({ method: "POST" }).middleware([requ
   }
   return { csv: csvRows(rows), count: rows.length };
 });
+
+export const getAdminContacts = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
+  setResponseHeader("Cache-Control", "no-store");
+  requireAdminPermission(await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" }));
+  const key = process.env['ACCOUNT_DATA_KEY'];
+  if (!key) throw new Error("Directory unavailable");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const rows = await collectPages(async (from, to) => {
+    const result = await supabaseAdmin.from("users").select("id, full_name, phone_encrypted, address_encrypted, created_at, last_login, consent_announcements_at").order("created_at", { ascending: false }).order("id").range(from, to);
+    if (result.error) throw new Error("Directory unavailable");
+    return result.data ?? [];
+  });
+  const contacts = [];
+  for (const row of rows) {
+    const identity = await supabaseAdmin.auth.admin.getUserById(row.id);
+    if (identity.error) throw new Error("Directory unavailable");
+    const address = await decryptValue<{ street: string; city: string; country: string }>(row.address_encrypted, key);
+    contacts.push({ id: row.id, full_name: row.full_name, email: identity.data.user.email ?? "", phone: await decryptValue<string>(row.phone_encrypted, key), street: address.street, city: address.city, country: address.country, created_at: row.created_at, last_login: row.last_login, consent_announcements_at: row.consent_announcements_at });
+  }
+  return contacts;
+});
+
+export const setAnnouncementConsent = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ enabled: z.boolean() }).parse(input)).handler(async ({ data, context }) => {
+    setResponseHeader("Cache-Control", "no-store");
+    const own = await context.supabase.from("users").select("id").eq("id", context.userId).single();
+    if (own.error) throw new Error("Account unavailable");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const result = await supabaseAdmin.from("users").update({ consent_announcements_at: data.enabled ? new Date().toISOString() : null }).eq("id", context.userId);
+    if (result.error) throw new Error("Could not save preference");
+    return { ok: true };
+  });
 
 export const exportOwnData = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   setResponseHeader("Cache-Control", "no-store");
