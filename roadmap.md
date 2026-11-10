@@ -1,5 +1,10 @@
 # Passwordless phone accounts
 
+## Admin announcement directory
+- [ ] Add role-protected contact directory, search and CSV/copy actions.
+- [ ] Add optional announcement consent and exclude non-consenting users from broadcast lists.
+- [ ] Verify access denial and available signed-in directory flows.
+
 - [x] SMS details and verification screens, session-driven navigation, legacy guest-transfer implementation.
 - [x] Encrypted users storage, separate privacy/sensitive consents, account edit/export/delete and authorized admin CSV screens.
 - [x] French and English privacy pages with truthful hosting/provider disclosures.
