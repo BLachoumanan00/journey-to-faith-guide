@@ -26,6 +26,6 @@ function ProfilePage() {
       <section className="border-t border-border pt-6"><h2 className="font-serif text-xl">{fr ? "Langue" : "Language"}</h2><div className="mt-3 flex gap-2">{(["fr", "en"] as const).map(code => <Button key={code} variant={lang === code ? "default" : "outline"} disabled={update.isPending} onClick={() => { setLang(code); update.mutate({ preferred_lang: code }); }}>{code === "fr" ? "Français" : "English"}</Button>)}</div></section>
       <section className="flex items-center justify-between gap-4 border-t border-border pt-6"><label htmlFor="reminders" className="text-sm">{t("reminders")}</label><Switch id="reminders" checked={profile.data?.reminders_enabled ?? false} disabled={update.isPending} onCheckedChange={checked => update.mutate({ reminders_enabled: checked })} /></section>
       <section className="border-t border-border pt-6"><h2 className="font-serif text-xl">{t("inviteCode")}</h2><p className="mt-2 font-serif text-2xl">{profile.data?.invite_code ?? "······"}</p></section>
-      {roles.data?.includes("admin") && <Button asChild variant="outline"><Link to="/admin">{fr ? "Export des comptes" : "Account export"}</Link></Button>}
+      {roles.data?.includes("admin") && <Button asChild variant="outline"><Link to="/admin">{fr ? "Administration" : "Administration"}</Link></Button>}
     </div></AppShell>;
 }

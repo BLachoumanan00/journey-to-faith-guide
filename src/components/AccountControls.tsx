@@ -6,7 +6,8 @@ import type { CountryCode } from "libphonenumber-js/max";
 import { Download, LoaderCircle, LogOut, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PhoneAccountForm, emptyDetails, normalizedPhone } from "./PhoneAccountForm";
-import { getAccount, updateAccount, exportOwnData, withdrawSensitiveConsent, deleteOwnAccount } from "@/lib/account.functions";
+import { getAccount, updateAccount, exportOwnData, withdrawSensitiveConsent, deleteOwnAccount, setAnnouncementConsent } from "@/lib/account.functions";
+import { Switch } from "@/components/ui/switch";
 import { profileSchema } from "@/lib/account-rules";
 import { downloadText } from "@/lib/download";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,7 @@ export function AccountControls() {
   const { lang } = useLang(); const fr = lang === "fr"; const navigate = useNavigate(); const qc = useQueryClient();
   const read = useServerFn(getAccount); const save = useServerFn(updateAccount); const exportData = useServerFn(exportOwnData); const withdraw = useServerFn(withdrawSensitiveConsent); const erase = useServerFn(deleteOwnAccount);
   const account = useQuery({ queryKey: ["private-account"], queryFn: () => read(), gcTime: 0 });
+  const announcements = useServerFn(setAnnouncementConsent);
   const [draft, setDraft] = useState(emptyDetails); const [country, setCountry] = useState<CountryCode>("MU");
   const [errors, setErrors] = useState<Record<string, string>>({}); const [pending, setPending] = useState(false); const [message, setMessage] = useState(""); const [confirmation, setConfirmation] = useState<"withdraw" | "delete" | null>(null);
   useEffect(() => { if (account.data) setDraft({ ...emptyDetails, ...account.data }); }, [account.data]);
@@ -24,6 +26,10 @@ export function AccountControls() {
   if (account.isPending) return <p role="status" className="py-6 text-clay">{fr ? "Chargement de vos données…" : "Loading your data…"}</p>;
   if (account.isError || !account.data) return <div className="py-6"><p className="text-sm text-destructive">{fr ? "Vos données ne sont pas disponibles." : "Your data is unavailable."}</p><Button variant="outline" onClick={() => void account.refetch()} className="mt-3">{fr ? "Réessayer" : "Retry"}</Button></div>;
   return <div className="space-y-6">
+    <section className="flex items-start justify-between gap-4 border-b border-border pb-5">
+      <label htmlFor="announcements" className="text-sm leading-6">{fr ? "J’accepte de recevoir les annonces de Bible en Main par e-mail ou téléphone. Facultatif ; je peux retirer mon accord à tout moment." : "I agree to receive Bible en Main announcements by email or phone. Optional; I can withdraw at any time."}</label>
+      <Switch id="announcements" checked={Boolean(account.data.consent_announcements_at)} disabled={pending} onCheckedChange={enabled => void run(async () => { await announcements({ data: { enabled } }); await account.refetch(); setMessage(fr ? "Préférence enregistrée." : "Preference saved."); })} />
+    </section>
     <form noValidate className="space-y-5" onSubmit={e => { e.preventDefault(); const parsed = profileSchema.safeParse({ ...draft, phone: normalizedPhone(draft.phone, country) }); if (!parsed.success) { const next: Record<string, string> = {}; parsed.error.issues.forEach(i => { next[String(i.path[0])] = fr ? "Champ obligatoire ou invalide." : "Required or invalid field."; }); setErrors(next); return; } setErrors({}); void run(async () => { await save({ data: parsed.data }); await qc.invalidateQueries(); setMessage(fr ? "Coordonnées enregistrées." : "Details saved."); }); }}>
       <PhoneAccountForm value={draft} onChange={setDraft} errors={errors} countryCode={country} setCountryCode={setCountry} />
       <Button type="submit" className="w-full" disabled={pending}>{pending ? <LoaderCircle className="animate-spin" /> : <Save />}{fr ? "Enregistrer" : "Save"}</Button>

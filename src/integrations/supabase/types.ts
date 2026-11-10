@@ -430,6 +430,7 @@ export type Database = {
       users: {
         Row: {
           address_encrypted: string
+          consent_announcements_at: string | null
           consent_privacy_at: string
           consent_sensitive_at: string | null
           created_at: string
@@ -442,6 +443,7 @@ export type Database = {
         }
         Insert: {
           address_encrypted: string
+          consent_announcements_at?: string | null
           consent_privacy_at?: string
           consent_sensitive_at?: string | null
           created_at?: string
@@ -454,6 +456,7 @@ export type Database = {
         }
         Update: {
           address_encrypted?: string
+          consent_announcements_at?: string | null
           consent_privacy_at?: string
           consent_sensitive_at?: string | null
           created_at?: string
