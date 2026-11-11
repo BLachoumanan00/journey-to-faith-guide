@@ -1,6 +1,6 @@
 # Créer l'application Android (.apk) de Bible en Main
 
-Durée : environ 15 minutes. Il faut un ordinateur (Windows, Mac ou Linux).
+Il faut un ordinateur (Windows, Mac ou Linux). La durée dépend de l’installation des outils et du téléchargement des dépendances.
 
 ## 1. Préparer l'ordinateur
 - Installer **Node.js** (version LTS) : https://nodejs.org
@@ -36,12 +36,13 @@ créer une clé de signature (à conserver précieusement), puis envoyer le fich
 `.aab` sur https://play.google.com/console (compte développeur : 25 $ une fois).
 
 ## À savoir
-- L'application ouvre la version publiée de Bible en Main : une connexion internet est nécessaire.
+- L'application ouvre la version publiée de Bible en Main : une connexion internet est nécessaire pour la première ouverture et la connexion au compte.
 - Pensez à **publier** l'application dans Lovable avant : chaque mise à jour publiée apparaît automatiquement dans l'app Android, sans refaire l'.apk.
 - Pour changer l'icône : dans Android Studio, clic droit sur `res` → **New → Image Asset**, et choisir l'icône de Bible en Main.
 
 ## Mode hors ligne (partiel)
 
-L'application garde en mémoire les pages, leçons et versets déjà ouverts. Sans internet, vous pouvez les relire.
-Il faut une connexion pour : la première ouverture, enregistrer des réponses ou des notes, poser une question à l'IA, et chercher un nouveau verset.
+Les contenus publics et les versets déjà consultés peuvent être conservés sur l'appareil. Les pages privées et les données personnelles ne sont pas mises en mémoire hors ligne.
+Il faut une connexion pour : la première ouverture, se connecter au compte, enregistrer des réponses ou des notes, poser une question à l'IA, et chercher un nouveau verset.
+Le fonctionnement hors ligne complet des leçons après connexion doit encore être vérifié sur le téléphone. L'APK ne contient pas une Bible complète ni toutes les leçons préchargées.
 Important : publiez l'application avant de créer l'.apk. Ouvrez-la une fois avec internet pour que la mise en mémoire se fasse.
