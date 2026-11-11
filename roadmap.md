@@ -1,5 +1,11 @@
 # Passwordless phone accounts
 
+## Bible, Android publishing and own-domain email
+- [ ] Verify real French verse loading and add retry for temporary failures.
+- [ ] Add accessible Android Studio instructions and publish the changes.
+- [ ] Grant and verify admin access for the verified bibleenmain00@gmail.com account.
+- [ ] Set up own-domain authentication emails and send a real sign-in email. Blocked: sender domain setup must be completed by the owner.
+
 ## Admin announcement directory
 - [x] Add role-protected contact directory, search and CSV/copy actions.
 - [x] Add optional announcement consent and exclude non-consenting users from broadcast lists.
