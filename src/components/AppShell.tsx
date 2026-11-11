@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { useLang } from "@/lib/i18n";
 import appIcon from "@/assets/app-icon.png.asset.json";
+import { useRoles, useSessionUser } from "@/hooks/useSession";
 
 const NAV = [
   { to: "/parcours", label: { fr: "Parcours", en: "Journey" } },
@@ -14,6 +15,8 @@ const NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { lang, setLang, t } = useLang();
+  const { user } = useSessionUser();
+  const roles = useRoles(user?.id);
 
   return (
     <div className="min-h-screen text-ink">
@@ -34,7 +37,13 @@ export function AppShell({ children }: { children: ReactNode }) {
         </button>
       </header>
 
-      <main className="mx-auto max-w-md px-6 pb-32">{children}</main>
+      <main className="mx-auto max-w-md px-6 pb-32">{children}
+        <footer className="mt-10 flex flex-wrap gap-5 border-t border-border pt-5 text-xs text-clay">
+          <Link to="/android" className="underline">{lang === "fr" ? "Instructions Android" : "Android instructions"}</Link>
+          <Link to="/profil" className="underline">{lang === "fr" ? "Mon compte" : "My account"}</Link>
+          {roles.data?.includes("admin") && <Link to="/admin" className="text-ribbon underline">Administration</Link>}
+        </footer>
+      </main>
 
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-ribbon/25 bg-paper/95 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between">
