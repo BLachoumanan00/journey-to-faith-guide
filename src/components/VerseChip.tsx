@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import { defaultTranslation, displayReference, fetchVerse, translationsFor } from "@/lib/bible";
 import { useLang } from "@/lib/i18n";
 
@@ -71,11 +73,11 @@ export function VerseChip({ reference, showHint = true }: { reference: string; s
             {verse.isPending ? (
               <p className="italic text-clay">{t("loading")}</p>
             ) : verse.isError ? (
-              <p className="text-sm italic text-clay">
+              <div className="space-y-3"><p className="text-sm italic text-clay">
                 {lang === "en"
                   ? `The text could not be loaded. Open your Bible at ${label}.`
                   : `Le texte n'a pas pu être chargé. Ouvrez votre Bible à ${label}.`}
-              </p>
+              </p><Button variant="outline" size="sm" onClick={() => void verse.refetch()} disabled={verse.isFetching}><RefreshCw className={verse.isFetching ? "animate-spin" : ""} />{lang === "en" ? "Try again" : "Réessayer"}</Button></div>
             ) : (
               <>
                 <p className="font-serif text-lg leading-relaxed">{verse.data?.text}</p>

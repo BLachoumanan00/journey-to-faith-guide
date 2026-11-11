@@ -14,3 +14,4 @@
 - Offline runtime caches only public lesson material and Bible lookups; exclude account/auth/admin pages and remove legacy private-data caches — device account changes must not expose another user's data.
 - SMS sign-in must fail closed until delivery, CAPTCHA and provider-side verification limits are configured and verified — application limits alone do not secure direct auth API calls.
 - Admin contact reads require authenticated server-side role checks before privileged decryption; bulk announcement lists require separate optional consent so registration never implies permission to broadcast.
+- Android build instructions live on a public content route with a downloadable guide; setup must stay accessible without an account and must not promise untested offline lesson access.
