@@ -1,5 +1,9 @@
 # Passwordless phone accounts
 
+## Missing admin access
+- [x] Restore the current verified account's admin role; verify populated dashboard and CSV download.
+- [x] Put Administration near the top of signed-in pages and refresh role visibility automatically; verified on desktop and phone.
+
 ## Bible, Android publishing and own-domain email
 - [x] Verify real French verse loading and add retry for temporary failures.
 - [x] Add accessible Android Studio instructions; request publishing after passing tests and scan.

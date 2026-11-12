@@ -50,6 +50,10 @@ export function useRoles(userId?: string) {
   return useQuery({
     queryKey: ["roles", userId],
     enabled: Boolean(userId),
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchInterval: 30_000,
     queryFn: async () => {
       if (!userId) throw new Error("Sign in required");
       const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);

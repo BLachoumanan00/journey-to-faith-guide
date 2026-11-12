@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import { useLang } from "@/lib/i18n";
 import appIcon from "@/assets/app-icon.png.asset.json";
@@ -36,6 +38,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           {lang === "fr" ? "FR / EN" : "EN / FR"}
         </button>
       </header>
+
+      {roles.data?.includes("admin") && (
+        <div className="mx-auto max-w-md px-6 pb-6">
+          <Button asChild variant="outline" className="w-full border-ribbon text-ribbon">
+            <Link to="/admin"><ShieldCheck />Administration</Link>
+          </Button>
+        </div>
+      )}
 
       <main className="mx-auto max-w-md px-6 pb-32">{children}
         <footer className="mt-10 flex flex-wrap gap-5 border-t border-border pt-5 text-xs text-clay">
